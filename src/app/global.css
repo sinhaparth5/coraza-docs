@@ -1,9 +1,64 @@
 @import "tailwindcss";
-@import "fumadocs-ui/css/shadcn.css";
+@import "fumadocs-ui/css/ocean.css";
 @import "fumadocs-ui/css/preset.css";
+
+@theme {
+  --color-pastel-green-50: #f2fdf0;
+  --color-pastel-green-100: #e0fbdd;
+  --color-pastel-green-200: #c3f5bd;
+  --color-pastel-green-300: #92ec89;
+  --color-pastel-green-400: #64dc58;
+  --color-pastel-green-500: #34c126;
+  --color-pastel-green-600: #269f1a;
+  --color-pastel-green-700: #207d18;
+  --color-pastel-green-800: #1e6318;
+  --color-pastel-green-900: #195116;
+  --color-pastel-green-950: #082d06;
+
+  --color-fd-background: #f2fdf0;
+  --color-fd-foreground: #082d06;
+  --color-fd-muted: #e0fbdd;
+  --color-fd-muted-foreground: #1e6318;
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: #082d06;
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: #082d06;
+  --color-fd-border: color-mix(in srgb, #269f1a 24%, transparent);
+  --color-fd-primary: #207d18;
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-secondary: #e0fbdd;
+  --color-fd-secondary-foreground: #195116;
+  --color-fd-accent: #c3f5bd;
+  --color-fd-accent-foreground: #195116;
+  --color-fd-ring: #34c126;
+}
+
+.dark {
+  --color-fd-background: #082d06;
+  --color-fd-foreground: #f2fdf0;
+  --color-fd-muted: color-mix(in srgb, #195116 72%, #082d06);
+  --color-fd-muted-foreground: #c3f5bd;
+  --color-fd-popover: color-mix(in srgb, #195116 58%, #082d06);
+  --color-fd-popover-foreground: #f2fdf0;
+  --color-fd-card: color-mix(in srgb, #195116 38%, #082d06);
+  --color-fd-card-foreground: #f2fdf0;
+  --color-fd-border: color-mix(in srgb, #92ec89 24%, transparent);
+  --color-fd-primary: #92ec89;
+  --color-fd-primary-foreground: #082d06;
+  --color-fd-secondary: color-mix(in srgb, #195116 70%, #082d06);
+  --color-fd-secondary-foreground: #e0fbdd;
+  --color-fd-accent: color-mix(in srgb, #207d18 68%, #082d06);
+  --color-fd-accent-foreground: #f2fdf0;
+  --color-fd-ring: #64dc58;
+}
 
 html {
   scrollbar-gutter: stable;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html > body[data-scroll-locked] {

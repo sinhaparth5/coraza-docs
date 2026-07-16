@@ -87,7 +87,7 @@ service, reason, when it was added) and lets you re-enable one
 Rules" table's Active/Disabled badge reflect only the **global** list. A rule scoped to one service
 is still shown as active globally, which keeps global and service-specific state distinct.
 
-## WAF detects but doesn't block?
+## WAF detects without blocking
 
 Make sure you're on a normal build (blocking is enabled after the CRS includes by design), and check
 whether the specific rule was disabled from the dashboard.

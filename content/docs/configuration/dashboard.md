@@ -9,10 +9,9 @@ The dashboard lives at `/admin` behind session-cookie login. Changes take effect
 Each page uses HTMX to replace only the affected part of the page. The sections below cover the
 dashboard controls and their HTTP routes.
 
-:::info[How "implement" works here]
-You don't edit files or restart anything to use a feature. Each dashboard form maps to a route that
-writes the change to `waf.db` and then **hot-reloads** the relevant subsystem (registry, blocklist,
-geo, WAF engine, rate limiter). The steps below are the implementation.
+:::info[Dashboard changes]
+Each form writes its change to `waf.db` and then **hot-reloads** the relevant subsystem (registry,
+blocklist, geo, WAF engine, or rate limiter). No file edit or restart is required.
 :::
 
 ![Coraza WAF Mod dashboard home — live traffic chart, requests today, blocked today, bot shield summary, and top threats panel](/img/docs/docs_dashboard.png)
@@ -272,8 +271,9 @@ Redis reachability **before** saving. Switching backends is a hot reload. See
 
 **Webhooks.** Configure event delivery (`POST /admin/settings/webhook` with `webhook_url`,
 `webhook_secret`, `webhook_enabled=1`, and one or more `webhook_events` checkboxes). If no events
-are selected it defaults to `blocked`. Delivery is asynchronous and signed with the secret; a slow
-endpoint never blocks logging. See [Threat Intel & Webhooks](/docs/security/threat-intel-webhooks).
+are selected it defaults to `blocked`. Delivery is asynchronous and includes the configured secret
+in the `X-WAF-Secret` header; a slow endpoint never blocks logging. See
+[Threat Intel & Webhooks](/docs/security/threat-intel-webhooks).
 
 **Threat-intel sources.** On **Threat Intel** (`/admin/threat-intel`): add a source with a **label**,
 a **URL** to a plain-text IP/CIDR list, and a sync **interval (hours)** (`POST /admin/threat-intel`).

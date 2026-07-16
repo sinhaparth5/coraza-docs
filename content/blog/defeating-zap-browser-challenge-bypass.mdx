@@ -27,7 +27,7 @@ OWASP ZAP has a [browser-driven scanning mode](https://www.zaproxy.org/docs/desk
 
 The browser loads the challenge page, runs the JavaScript, and solves the SHA-256 nonce with its JavaScript engine. It then posts a correct solution and receives a valid bypass cookie. Every later request carries that trusted session, allowing ZAP's active scan to run behind the bot gate.
 
-The proof-of-work wasn't broken. It was answering the wrong question.
+The proof-of-work only confirmed that a JavaScript engine ran. It could not tell who controlled the browser.
 
 ## The fix: look for the driver, not just the browser
 
@@ -45,22 +45,18 @@ The page reports any detected signal with the proof-of-work solution. The server
 
 ZAP's browser-driven scanner can still solve and submit the nonce, but it receives no trusted session and returns to the challenge. Default Selenium, Puppeteer, and Playwright crawlers get the same result.
 
-## It compounds with autoban
+## Repeated attempts feed autoban
 
 A scanner that repeatedly hits the challenge also accumulates autoban points. Every unsolved challenge redirect scores **1 point** toward an [automatic IP ban](/docs/security/blocking#automatic-ip-banning). A tool that keeps hammering the endpoint, getting redirected each time, accrues points inside the sliding window and eventually crosses the threshold. At the threshold, the WAF writes a permanent block rule instead of redirecting the client again. The bot challenge and autoban engine already feed the same fan-out pipeline.
 
 ## Limitation
 
-These checks do not stop an attacker who actively hides the automation signals.
-
-JavaScript in the client reads the signals and sends the results to the server. An attacker can inspect that code, patch `navigator.webdriver`, remove the `cdc_` properties, and spoof the User-Agent before submitting. Open-source stealth plugins already do this, so the check does not stop that attacker.
-
-It does stop default OWASP ZAP browser scans and unmodified Selenium, Puppeteer, and Playwright crawlers, because those tools expose the signals. Bypassing the challenge now requires a custom stealth setup rather than a checkbox in ZAP. This check adds another layer beside proof-of-work, anomaly scoring, JA4 fingerprinting, and autoban; it is not a complete defense on its own.
+These checks stop default OWASP ZAP browser scans and unmodified Selenium, Puppeteer, and Playwright crawlers because those tools expose the signals. They do not stop an attacker who patches `navigator.webdriver`, removes the `cdc_` properties, and spoofs the User-Agent before submitting. Open-source stealth plugins already make those changes. The check raises the effort required to bypass the challenge, but it is not a complete defense on its own.
 
 ## Upgrading
 
-The detection is part of the challenge page and server-side verifier. It takes effect when the new binary starts, with no migration or configuration change. If you already have bot protection enabled, you're covered on restart. If you don't, turn it on under **Settings → Bot protection** and set a per-service bot mode from each service's Manage panel.
+The detection is part of the challenge page and server-side verifier. It takes effect when the new binary starts, with no migration or configuration change. Existing bot-protection deployments pick it up after a restart. Otherwise, enable it under **Settings → Bot protection** and set a per-service bot mode from each service's Manage panel.
 
 To test the change, point ZAP's browser-driven scan at a protected service before and after upgrading. The old build gives it a session. The new build loops on the challenge and eventually bans the scanner if it keeps running.
 
-Full details are in the [Bot Protection & Fingerprinting](/docs/security/bot-and-fingerprinting) docs. Questions or a bypass I've missed? Open an issue on [GitLab](https://gitlab.com/sinhaparth5/coraza-waf-mod/issues).
+The [Bot Protection & Fingerprinting](/docs/security/bot-and-fingerprinting) docs cover the implementation. Report bypasses on [GitLab](https://gitlab.com/sinhaparth5/coraza-waf-mod/issues).

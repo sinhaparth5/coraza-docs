@@ -41,8 +41,8 @@ Two match modes per service:
 **Routing precedence:** all prefix matches are evaluated first (**longest prefix wins**), then host
 matches — mirroring nginx `location` blocks beating `server_name` defaults.
 
-Each service gets its **own pre-built reverse proxy** with sane timeouts (5s dial, 10s response
-header) so a slow/dead backend cannot stall browser connection slots indefinitely. Services are
+Each service gets its **own pre-built reverse proxy** with a 5-second dial timeout and a 10-second
+response-header timeout, so a slow or dead backend cannot hold browser connection slots indefinitely. Services are
 **database-backed and hot-reloaded**: adding, editing, or removing a service rebuilds the routing
 registry instantly with **no restart**.
 

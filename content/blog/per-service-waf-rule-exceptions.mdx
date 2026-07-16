@@ -67,10 +67,6 @@ After scoping the exception to the API service:
 
 The Disabled Rules card and the Active/Disabled badge in the Top Firing Rules table reflect only the global list. A rule with a service exception still appears globally active. Keeping the lists separate prevents the UI from suggesting that protection was removed from every service.
 
-## Why scope matters
-
-Any CRS rule can be a false positive for one backend and useful for another. A global exception removes coverage from every service to fix a local problem. A service-scoped exception limits that trade-off to the backend that needs it.
-
 ## Using it
 
 From the **WAF Rules** page (`/admin/waf-rules`):
@@ -82,4 +78,4 @@ From the **WAF Rules** page (`/admin/waf-rules`):
 
 Full details, including the compiled directive set and how the per-service engine selection works, are in the [WAF Inspection](/docs/security/waf#per-service-exceptions) docs.
 
-Questions or a false positive you're stuck on? Open an issue on [GitHub](https://github.com/sinhaparth5/coraza-waf-mod/issues).
+Report unresolved false positives on [GitHub](https://github.com/sinhaparth5/coraza-waf-mod/issues).

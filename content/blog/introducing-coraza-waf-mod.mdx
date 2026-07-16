@@ -21,11 +21,11 @@ ModSecurity is powerful, but it's a C module that needs to be compiled against y
 
 Managed services such as Cloudflare WAF, AWS WAF, and Fastly work well, but each ties the deployment to a CDN or cloud provider. Their costs also rise with traffic.
 
-There was no good answer for the developer who wants serious WAF protection on a single VPS, self-hosted, with a UI they can actually use.
+I couldn't find a self-hosted WAF that fit on one VPS and had an admin UI I wanted to use.
 
-## What Coraza WAF Mod does differently
+## A WAF with no runtime dependencies
 
-Coraza WAF Mod takes a different approach: it compiles the WAF engine and the OWASP CRS directly into the binary at build time. There are no modules to load, no rule files to download, and no external process to keep running. The binary *is* the WAF. You run it, it proxies traffic, and it blocks attacks.
+Coraza WAF Mod compiles the WAF engine and OWASP CRS into the binary at build time. There are no modules to load, rule files to download, or sidecar processes to run. Starting the binary starts both the WAF and reverse proxy.
 
 The WAF engine is [Coraza v3](https://coraza.io), the OWASP-backed Go implementation of the ModSecurity ruleset. The CRS is compiled in with `SecRuleEngine On` applied after the CRS includes, so rules actually block rather than merely score. Out of the box it blocks:
 

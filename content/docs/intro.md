@@ -57,4 +57,4 @@ in the database.
   nginx-style `access.log`, and a live in-dashboard terminal view of the same stream. See
   [Metrics](/docs/configuration/metrics) and [Access Log](/docs/configuration/access-log).
 
-Ready to install? Head to [Requirements](/docs/installation/requirements).
+Continue with the [installation requirements](/docs/installation/requirements).

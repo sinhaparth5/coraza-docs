@@ -7,8 +7,8 @@ description: A composite 0–100 per-IP risk score combining autoban, bot, ASN, 
 
 ## Unified per-IP threat score
 
-Every logged request feeds a **composite 0–100 risk score** per client IP, combining signals that
-would otherwise stay siloed in separate subsystems:
+Every logged request feeds a **composite 0–100 risk score** per client IP. The score combines data
+already collected by separate subsystems:
 
 | Component | Weight | Source |
 |---|---|---|
@@ -33,18 +33,16 @@ the same one-request lag autoban's own ban already has.
 
 ## Adaptive enforcement
 
-Adaptive enforcement consumes the score above to **automatically** scale the global rate limit and
-force a bot challenge for high-risk clients — the two levers that are cheap and fully reversible with
-the current architecture. (Tiering Coraza's *paranoia level* per request was considered and
-deliberately excluded: paranoia level is baked into a compiled WAF engine at build time with no
-per-transaction override, so supporting it would mean holding multiple full-CRS engines resident in
-memory at once — tracked as a separate follow-up, not built here.)
+Adaptive enforcement uses the score to scale the global rate limit and force a bot challenge for
+high-risk clients. Both actions are reversible with the current architecture. Coraza's *paranoia
+level* cannot be changed per request because it is fixed when the WAF engine is compiled. Supporting
+several levels would require multiple full-CRS engines in memory, so this implementation does not do
+that.
 
 :::warning[Disabled by default]
-Unlike autoban, adaptive enforcement starts **off**. It's a brand-new mechanism riding on a heuristic
-score (the ASN classification, in particular, can misfire) and it includes a security-*loosening*
-action — relaxing the rate limit for low-risk IPs — so look at real scores accumulating on the IP
-Rules page for a while before opting in.
+Unlike autoban, adaptive enforcement starts **off**. The score uses heuristics, and ASN
+classification can misfire. It can also relax the rate limit for low-risk IPs. Review the scores on
+the IP Rules page before enabling it.
 :::
 
 **Two independently configurable thresholds**, so tightening the rate limit and forcing a challenge

@@ -35,6 +35,9 @@ importers:
       takumi-js:
         specifier: ^2.1.1
         version: 2.2.0(csstype@3.2.3)(react@19.2.7)
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.5.3

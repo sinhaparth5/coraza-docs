@@ -1,0 +1,27 @@
+{
+  "release": {
+    "label": "Release",
+    "description": "Product releases and version announcements."
+  },
+  "security": {
+    "label": "Security",
+    "description": "Web application security, WAF rules, and threat intelligence."
+  },
+  "waf": { "label": "WAF", "description": "Web Application Firewall topics." },
+  "go": {
+    "label": "Go",
+    "description": "Posts about the Go programming language and ecosystem."
+  },
+  "autoban": {
+    "label": "Autoban",
+    "description": "Automatic IP banning and threat response."
+  },
+  "email-alerts": {
+    "label": "Email Alerts",
+    "description": "Email notification and alerting features."
+  },
+  "bot-protection": {
+    "label": "Bot Protection",
+    "description": "Bot detection, JS challenges, and defeating automated scanners."
+  }
+}

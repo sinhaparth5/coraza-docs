@@ -1,0 +1,15 @@
+{
+  "title": "Configuration",
+  "description": "CLI flags, dashboard controls, TLS, rate limiting, logs, and metrics.",
+  "pages": [
+    "cli",
+    "dashboard",
+    "tls",
+    "rate-limiting",
+    "log-retention",
+    "access-log",
+    "metrics",
+    "varnish",
+    "email-alerts"
+  ]
+}

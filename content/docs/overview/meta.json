@@ -1,0 +1,5 @@
+{
+  "title": "Overview",
+  "description": "What Coraza WAF Mod protects and how it is put together.",
+  "pages": ["architecture"]
+}

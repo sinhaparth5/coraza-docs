@@ -6,6 +6,12 @@ const withMDX = createMDX();
 const config = {
   images: {
     qualities: [75, 88, 90],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "github.com",
+      },
+    ],
   },
   output: "standalone",
   serverExternalPackages: ["@takumi-rs/core"],

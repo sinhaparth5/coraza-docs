@@ -1,0 +1,90 @@
+---
+slug: ja4-autoban-email-alerts
+date: 2026-07-02
+title: "JA4 Fingerprinting, Automatic IP Banning, and Email Alerts"
+authors: [parth]
+tags: [security, waf, autoban, email-alerts, go]
+description: Coraza WAF Mod now uses JA4 TLS fingerprints, can ban IPs based on threat scores, and gives alert emails a recognizable sender name.
+image: /img/seo_image.jpg
+keywords: [coraza, waf, ja4, tls fingerprinting, autoban, ip banning, email alerts, security]
+---
+
+This week Coraza WAF Mod moved from JA3 to JA4 TLS fingerprinting, gained automatic IP banning, and started putting a recognizable sender name on alert emails.
+
+{/* truncate */}
+
+## JA4 TLS fingerprinting replaces JA3
+
+JA3 has been the de-facto standard for TLS client fingerprinting since 2017. It hashes selected `ClientHello` fields, including cipher suites, extensions, and elliptic curves, into an MD5 digest. The problem is that the order of TLS extensions varies across library versions, so the same client can produce different JA3 hashes depending on minor SDK updates. More critically, an attacker can trivially produce a JA3 hash that matches a benign browser just by reordering cipher suites.
+
+JA4, introduced by FoxIO, fixes both of these:
+
+- JA4 normalises extension order before hashing, so the same client tool keeps a stable fingerprint across minor TLS library upgrades.
+- The raw JA4 string exposes useful fields directly. `t13d1516h2` means TLS 1.3, 15 ciphers, 16 extensions, and HTTP/2. A JA3 hash requires a lookup table.
+- The combined hash is computed from sorted, normalised fields, making it significantly harder to fake a browser fingerprint by shuffling the extension list.
+
+Coraza WAF Mod now computes JA4 at the TLS handshake and stores the hash with every request log. You'll see it in the detail view alongside the country and ASN. No configuration change is required.
+
+## Automatic IP banning
+
+The new `autoban` engine watches the log fan-out pipeline (the same channel that feeds the webhook pusher and the SSE stream) and maintains a per-IP score in a sliding time window. When a single IP accumulates enough points within the window, it is automatically written as a permanent global block rule and the IP blocklist is hot-reloaded.
+
+### The scoring model
+
+| Event | Points |
+|---|---|
+| Critical WAF block (SQLi, XSS, RCE, LFI) | **5** |
+| Other WAF rule block | **2** |
+| Rate-limited | **1** |
+| Already-blocked traffic | **0** |
+
+Already-blocked IPs never score, so a banned IP can't endlessly re-trigger the ban logic. Admin-added allow rules always win. The engine calls `GetIPRuleType` before applying a score or writing a ban, so it does not alter manually managed IP rules.
+
+### Default thresholds
+
+The defaults are **10 points / 10-minute window**. At that setting an attacker running a SQL injection scan hits the threshold on the second critical-class block (5 + 5 = 10). A noisy but non-critical scanner (rate-limit hits) takes ten events in ten minutes, which filters out one-off transient spikes.
+
+If your site serves developer tooling, SQL-heavy search forms, or users behind shared NAT (universities, corporate proxies), I'd recommend raising the threshold to 20+ to avoid false-positive bans. The score and window are both editable from the dashboard without a restart.
+
+### What the ban looks like
+
+When an IP is banned:
+
+1. A permanent `block` rule is written to `ip_rules` with a machine-stamped note: IP, trigger reason, score, and timestamp.
+2. The in-memory blocklist reloads, and the next request from that IP is rejected before the WAF runs.
+3. If email is configured, a ban alert is sent with the same details.
+4. The IP appears in the **IP Rules** list with an amber **Auto** badge and the ban reason inline.
+
+The Automatic banning card on the IP Rules page contains the enable toggle, score threshold, and time window.
+
+### How it relates to CrowdSec
+
+Autoban and [CrowdSec](https://www.crowdsec.net/) solve different parts of the problem. Autoban runs locally and responds to traffic hitting your instance. CrowdSec combines reports from its community and publishes blocklists. A planned CrowdSec LAPI poller will feed its data into the IP blocklist already used by autoban and threat-intel sync.
+
+## Email alerts with a proper display name
+
+Before this change, alert emails arrived from a bare `alert@astrareconslabs.com` address. If you have multiple monitoring services sending alerts, figuring out which one an email came from means reading the subject line, not the sender.
+
+The `mailer` package now sets a `From` header with a display name:
+
+```
+From: Coraza WAF Mod <alert@astrareconslabs.com>
+```
+
+Gmail, Apple Mail, and Outlook all render the display name in the sender column, so ban alerts and daily digest emails are immediately identifiable without opening them.
+
+If the server is offline at midnight, the daily report scheduler sends the missed report on the next start. The SMTP client has a 45-second timeout so a slow mail server doesn't stall the goroutine indefinitely. One gap remains. If a send fails at midnight, the scheduler waits until the following midnight or a restart, so a transient SMTP failure can skip one report. I plan to add a short retry loop.
+
+## Upgrading
+
+All three changes are in the working tree on `26-automatically-block-the-ip-addresses` and will be merged to `main` shortly. The storage migration for the new `ip_rules.note` column and the `autoban_config` meta key runs on the first start after upgrade. No manual schema work is required.
+
+After upgrading:
+
+1. Restart the service. The migration runs on startup.
+2. Go to **IP Rules → Automatic banning** and enable it (it ships disabled).
+3. Optionally configure email under **Settings → Email alerts**.
+
+Existing log rows keep their stored fingerprint. New rows use JA4 after the upgraded binary starts.
+
+Questions or issues? Open one on [GitLab](https://gitlab.com/sinhaparth5/coraza-waf-mod/issues).

@@ -1,0 +1,120 @@
+---
+slug: introducing-coraza-waf-mod
+date: 2026-07-01
+title: "Introducing Coraza WAF Mod: A Web Application Firewall in a Single Binary"
+authors: [parth]
+tags: [release, waf, security, go]
+description: Coraza WAF Mod puts OWASP CRS protection, an admin dashboard, IP and geo blocking, rate limiting, and TLS termination in a single Go binary with no configuration files or service restarts.
+image: /img/seo_image.jpg
+keywords: [coraza, waf, web application firewall, owasp crs, go, reverse proxy, security, ip blocking, rate limiting, tls]
+---
+
+I wanted WAF protection for a self-hosted project without paying for a managed CDN service or maintaining a custom ModSecurity build. Coraza WAF Mod came out of that need.
+
+Coraza WAF Mod is a reverse proxy and Web Application Firewall packaged as a single Go binary. Put it in front of your services and run one command. It provides OWASP Core Rule Set protection, an admin dashboard, IP and geo blocking, rate limiting, per-service TLS, and bot protection without changes to application code or a separate config file.
+
+{/* truncate */}
+
+## The problem with existing WAF setups
+
+ModSecurity is powerful, but it's a C module that needs to be compiled against your web server, loaded via dynamic linking, and kept synchronized with a rule set you maintain separately. The OWASP CRS ships as a collection of `.conf` files with a readme that runs to dozens of pages. Misconfigure the rule engine mode and nothing gets blocked; too aggressive and you start blocking legitimate users. Tuning it on a live server means editing files and reloading nginx, hoping you didn't introduce a syntax error.
+
+Managed services such as Cloudflare WAF, AWS WAF, and Fastly work well, but each ties the deployment to a CDN or cloud provider. Their costs also rise with traffic.
+
+There was no good answer for the developer who wants serious WAF protection on a single VPS, self-hosted, with a UI they can actually use.
+
+## What Coraza WAF Mod does differently
+
+Coraza WAF Mod takes a different approach: it compiles the WAF engine and the OWASP CRS directly into the binary at build time. There are no modules to load, no rule files to download, and no external process to keep running. The binary *is* the WAF. You run it, it proxies traffic, and it blocks attacks.
+
+The WAF engine is [Coraza v3](https://coraza.io), the OWASP-backed Go implementation of the ModSecurity ruleset. The CRS is compiled in with `SecRuleEngine On` applied after the CRS includes, so rules actually block rather than merely score. Out of the box it blocks:
+
+- **SQL injection:** union selects, blind injection, error-based extraction
+- **Cross-site scripting (XSS):** reflected, stored, DOM-based
+- **Remote code execution:** shell injection, eval abuse
+- **Path traversal:** `../` sequences and encoded variants
+- **Restricted file access:** `.htaccess`, `/etc/passwd`, and server config files
+- **Known scanner user agents:** Nikto, sqlmap, Nessus, and hundreds more
+
+If a CRS rule fires too aggressively on your application, you can disable it by ID from the dashboard. The WAF engine rebuilds itself from the current disabled-rule list without a restart.
+
+## The admin dashboard
+
+![Coraza WAF Mod admin dashboard showing live traffic chart, requests today, blocked today, bot shield summary, and top threats panel](/img/docs/docs_dashboard.png)
+
+The dashboard at `/admin` controls the running service. HTMX updates only the affected part of the page when you add a service, block an IP, or disable a rule. Each change takes effect immediately, without a restart or deployment.
+
+The home view shows live traffic and threat charts updated in real time, along with blocked requests today, bot challenge statistics, and the top firing WAF rules. If you're on page 1 with no filters applied, the logs page live-tails incoming requests over Server-Sent Events.
+
+## Services: defining what gets proxied
+
+A *service* maps an incoming request to a backend. You define either a host match (virtual hosting by `Host` header, e.g. `api.example.com → http://127.0.0.1:8080`) or a prefix match (routing by URL path, e.g. `/api → http://127.0.0.1:8080`). Before saving, the server validates the backend URL and runs a one-shot reachability probe. It rejects an unreachable upstream during setup rather than waiting for a request to fail.
+
+![Services page showing the Add Service wizard and the configured services list](/img/docs/docs_service.png)
+
+Each service can have its own rate limit, TLS certificate, and bot protection mode, or it can inherit the global settings. Prefix routing strips the prefix before proxying, so `/api/users` reaches the backend as `/users`, matching nginx's `proxy_pass http://backend/` convention.
+
+## IP and geo blocking
+
+IP rules and geo rules are two independent block lists, both enforced before the WAF runs and both hot-reloaded on change.
+
+IP rules accept a single IPv4 or IPv6 address or a CIDR range. They can be scoped globally or to a specific service. The threat intelligence sync uses the same mechanism. It fetches external IP lists on a configurable interval and merges them into the blocklist.
+
+![IP Rules page showing the Add IP Rule form and the Active IP Rules list](/img/docs/docs_ip_rules.png)
+
+Geo rules block or allow entire countries by ISO 3166-1 alpha-2 code. Country lookup uses the bundled GeoLite2 database and the *resolved real client IP*. Behind Cloudflare or a load balancer, configure `--trusted-proxies` with the proxy's CIDR.
+
+## Rate limiting
+
+Rate limiting runs on a token-bucket algorithm with per-service overrides and two backend options: in-process memory (zero dependencies, single-node) or Redis (shared state across multiple instances). Switching backends reloads the limiter without restarting the service.
+
+The rate limiter is enforced against the real client IP, which means it can't be trivially evaded by cycling IP headers as long as `--trusted-proxies` is configured correctly.
+
+## TLS termination
+
+Coraza WAF Mod terminates TLS for your services so your backends can stay on plain HTTP. Certificates are managed through the dashboard in three ways:
+
+- **Upload** a cert/key pair for a specific service
+- Store named certificates in the pool and assign them to multiple services
+- Use ACME to let Let's Encrypt provision and renew a certificate on the first request to a host-matched service
+
+At handshake time, SNI resolution follows the precedence: per-service custom → pool/ACME → global fallback. Private keys are written to disk at mode `0600` and never stored in the database.
+
+## Bot protection
+
+The bot protection system issues JavaScript proof-of-work challenges to clients that exceed an anomaly score threshold. Clients that solve the challenge receive a signed bypass cookie valid for a configurable TTL. The dashboard controls the threshold and TTL. Each service can override the global mode with `always`, `off`, or `inherit`.
+
+## Request logs and metrics
+
+Every proxied request is logged to SQLite with the real client IP, country, ASN, matched WAF rule (if any), block reason, and TLS connection details. Logs are live-tailed on the dashboard and can be filtered by service, status class, or time range and exported as CSV.
+
+![Live Logs page showing the live stream indicator, filter controls, and the request log table](/img/docs/docs_logs.png)
+
+Prometheus metrics are served at `/admin/metrics` (behind the same admin auth) for scraping by Grafana, Prometheus, or any compatible collector.
+
+## Getting started
+
+The fastest path is the installer:
+
+```bash
+curl -fsSL https://gitlab.com/sinhaparth5/coraza-waf-mod/-/raw/main/install.sh -o install.sh
+# review the script, then:
+bash install.sh
+```
+
+The installer prompts for your admin email and password, installs the binary to `/usr/local/bin`, writes a systemd unit, and starts the service. Open `http://<host>:8080/admin` and you're in.
+
+For a manual install or to build from source, see the [installation guide](/docs/installation/requirements).
+
+## Roadmap
+
+I am running v1.0 in production. The next items on the roadmap are:
+
+- Cluster mode with shared Redis state across nodes
+- Webhook-driven rule updates from CI/CD pipelines
+- OpenTelemetry traces for proxied requests
+- Rule-level CRS scoring controls in the dashboard
+
+The project is open source under the Apache 2.0 licence. Issues, pull requests, and feedback are welcome on [GitLab](https://gitlab.com/sinhaparth5/coraza-waf-mod).
+
+If you run into anything, the [FAQ](/docs/faq) and [troubleshooting guide](/docs/troubleshooting) cover the most common questions. For everything else, open an issue.

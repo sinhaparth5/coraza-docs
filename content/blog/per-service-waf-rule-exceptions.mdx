@@ -1,0 +1,85 @@
+---
+slug: per-service-waf-rule-exceptions
+date: 2026-07-12
+title: "Disabling a WAF Rule for One Service Instead of Everyone: Fixing a CRUD False Positive"
+authors: [parth]
+tags: [security, waf, go]
+description: CRS rule 911100 blocked a legitimate PATCH request. A per-service exception fixes the false positive without disabling HTTP-method enforcement for other services.
+image: /img/seo_image.jpg
+keywords: [coraza, waf, owasp crs, false positive, rule 911100, allowed methods, per-service, waf tuning]
+---
+
+A backend team using Coraza WAF Mod received a `403` for every `PATCH` to a REST endpoint. CRS rule `911100` caused the block. Disabling it globally fixed the endpoint but also removed HTTP-method enforcement from every other service, so the exception needed a narrower scope.
+
+{/* truncate */}
+
+## The false positive
+
+The failing request looked like this:
+
+```
+PATCH /api/v1/posts/27 HTTP/1.1
+Host: cdn.example.com
+Content-Type: application/json
+
+{"title": "Updated title"}
+```
+
+The log detail view showed the routine partial update being blocked:
+
+- **Status:** `403`
+- **Matched rule:** `911100`
+- **Action:** `deny`
+
+The payload contained no script tags, SQL syntax, or path traversal. The HTTP method triggered the rule.
+
+## Why CRS blocks PATCH by default
+
+Rule `911100` is the OWASP Core Rule Set's **"Method is not allowed by policy"** check. It compares the HTTP method against `tx.allowed_methods`, and out of the box that variable is set to:
+
+```
+GET HEAD POST OPTIONS
+```
+
+`PATCH`, `PUT`, and `DELETE` are not on the list. CRS uses this conservative default because many sites do not need mutation methods. A REST API often depends on them for routine CRUD operations, causing rule `911100` to block valid updates and deletes.
+
+Coraza WAF Mod enables blocking with `SecRuleEngine On` after the CRS includes. CRS defaults to `DetectionOnly`, and an earlier ordering mistake in this project left that default active. In this case, rule `911100` blocked the request as configured.
+
+## The wrong fix: disable it globally
+
+The WAF Rules page lets you disable a rule by ID and record a reason. On save, the engine rebuilds from the disabled-rule list without a restart. Disabling `911100` there fixes the failing `PATCH` immediately.
+
+It also removes HTTP-method enforcement for **every other service** behind the WAF. If you're running five backends and only one of them needs `PATCH`/`PUT`/`DELETE`, the other four just lost a layer of protection they never asked to give up. That's the wrong trade-off for a rule that's only noisy against one backend.
+
+## Scope the exception to one service
+
+The disable form has a **Scope** selector: `Global (all services)`, or a specific service from a dropdown. Picking the service instead of Global changes what gets stored and how the WAF engine handles it.
+
+Globally disabled rules go into `waf_disabled_rules`, with one row per rule ID. That schema cannot represent a rule disabled for one service but active for another. Scoped exceptions go into a separate table (`waf_service_rule_exceptions`) keyed by service, so the same rule ID can be exempted for one service while every other service keeps enforcing it normally.
+
+A service with a scoped exception gets its own compiled Coraza engine. It combines the global disabled-rule list with that service's exceptions, builds once per reload, and swaps behind the same lock as the shared engine. Services without exceptions continue using the shared engine and require no extra engine instance.
+
+After scoping the exception to the API service:
+
+- The API's engine now allows `PATCH`/`PUT`/`DELETE` through rule `911100` specifically.
+- Every other service's requests still hit the same rule, unchanged.
+- The Per-Service Exceptions card lists the rule ID, service, reason, and timestamp, and lets you re-enable the rule without changing the global list.
+
+The Disabled Rules card and the Active/Disabled badge in the Top Firing Rules table reflect only the global list. A rule with a service exception still appears globally active. Keeping the lists separate prevents the UI from suggesting that protection was removed from every service.
+
+## Why scope matters
+
+Any CRS rule can be a false positive for one backend and useful for another. A global exception removes coverage from every service to fix a local problem. A service-scoped exception limits that trade-off to the backend that needs it.
+
+## Using it
+
+From the **WAF Rules** page (`/admin/waf-rules`):
+
+1. Find the rule ID in the request's log detail view (or the "Top Firing Rules" table if it's a repeat offender).
+2. Open the disable form, enter the rule ID and a reason.
+3. Set **Scope** to the specific service instead of `Global`.
+4. Save. The change takes effect immediately without a restart.
+
+Full details, including the compiled directive set and how the per-service engine selection works, are in the [WAF Inspection](/docs/security/waf#per-service-exceptions) docs.
+
+Questions or a false positive you're stuck on? Open an issue on [GitHub](https://github.com/sinhaparth5/coraza-waf-mod/issues).

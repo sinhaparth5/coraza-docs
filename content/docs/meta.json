@@ -1,0 +1,12 @@
+{
+  "title": "Coraza WAF",
+  "pages": [
+    "intro",
+    "overview",
+    "installation",
+    "configuration",
+    "security",
+    "troubleshooting",
+    "faq"
+  ]
+}

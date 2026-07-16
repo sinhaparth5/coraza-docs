@@ -1,0 +1,66 @@
+---
+slug: defeating-zap-browser-challenge-bypass
+date: 2026-07-05
+title: "How OWASP ZAP Bypassed Our Bot Challenge"
+authors: [parth]
+tags: [security, waf, bot-protection, autoban, go]
+description: OWASP ZAP's browser-driven scanner solved our JavaScript proof-of-work challenge and scanned behind the WAF. We added automation checks before issuing a bypass cookie.
+image: /img/seo_image.jpg
+keywords: [coraza, waf, owasp zap, bot protection, js challenge, proof of work, webdriver, selenium, headless browser, bypass]
+---
+
+OWASP ZAP's browser-driven scan mode passed Coraza WAF Mod's bot challenge. The proof-of-work test verified that the client could run JavaScript, but ZAP drives a browser that can do exactly that. We now check for browser automation before issuing the bypass cookie.
+
+{/* truncate */}
+
+## What the challenge actually proved
+
+When bot protection is active, a client without a valid bypass cookie gets redirected to a JavaScript **proof-of-work challenge** at `/_cz/challenge`. The page hands the browser a SHA-256 nonce to grind, and once the browser finds a solution it posts it back and receives an HMAC-signed bypass cookie good for the configured TTL.
+
+The intent is to price out cheap scrapers. Bare HTTP clients such as `curl`, Python `requests`, and Go's `net/http` cannot run the JavaScript, so they never produce a solution or receive the cookie. The server hands out a nonce and verifies one hash, keeping its work at O(1).
+
+Solving the proof-of-work proves that a JavaScript engine executed the page. It says nothing about whether a person or an automation framework controls the browser.
+
+## The bypass: ZAP drives a real browser
+
+OWASP ZAP has a [browser-driven scanning mode](https://www.zaproxy.org/docs/desktop/addons/selenium/) that controls Firefox or Chrome through Selenium/WebDriver and crawls the target through that browser. Puppeteer and Playwright do the same thing for their own tooling.
+
+The browser loads the challenge page, runs the JavaScript, and solves the SHA-256 nonce with its JavaScript engine. It then posts a correct solution and receives a valid bypass cookie. Every later request carries that trusted session, allowing ZAP's active scan to run behind the bot gate.
+
+The proof-of-work wasn't broken. It was answering the wrong question.
+
+## The fix: look for the driver, not just the browser
+
+WebDriver, ChromeDriver, and common headless frameworks leave fingerprints in the DOM and JavaScript runtime. Before submitting a proof-of-work solution, the challenge page now checks for those automation signals.
+
+The signals it checks:
+
+- `navigator.webdriver`, which spec-compliant WebDriver sessions set to `true`
+- ChromeDriver's injected `cdc_` and `$cdc_` document properties
+- Chrome's `window.domAutomationController` hook
+- Globals left by Selenium, Puppeteer, Playwright, PhantomJS, and Nightmare
+- The default `HeadlessChrome` User-Agent token
+
+The page reports any detected signal with the proof-of-work solution. The server refuses to issue a bypass cookie to a flagged client, even when the solution is correct.
+
+ZAP's browser-driven scanner can still solve and submit the nonce, but it receives no trusted session and returns to the challenge. Default Selenium, Puppeteer, and Playwright crawlers get the same result.
+
+## It compounds with autoban
+
+A scanner that repeatedly hits the challenge also accumulates autoban points. Every unsolved challenge redirect scores **1 point** toward an [automatic IP ban](/docs/security/blocking#automatic-ip-banning). A tool that keeps hammering the endpoint, getting redirected each time, accrues points inside the sliding window and eventually crosses the threshold. At the threshold, the WAF writes a permanent block rule instead of redirecting the client again. The bot challenge and autoban engine already feed the same fan-out pipeline.
+
+## Limitation
+
+These checks do not stop an attacker who actively hides the automation signals.
+
+JavaScript in the client reads the signals and sends the results to the server. An attacker can inspect that code, patch `navigator.webdriver`, remove the `cdc_` properties, and spoof the User-Agent before submitting. Open-source stealth plugins already do this, so the check does not stop that attacker.
+
+It does stop default OWASP ZAP browser scans and unmodified Selenium, Puppeteer, and Playwright crawlers, because those tools expose the signals. Bypassing the challenge now requires a custom stealth setup rather than a checkbox in ZAP. This check adds another layer beside proof-of-work, anomaly scoring, JA4 fingerprinting, and autoban; it is not a complete defense on its own.
+
+## Upgrading
+
+The detection is part of the challenge page and server-side verifier. It takes effect when the new binary starts, with no migration or configuration change. If you already have bot protection enabled, you're covered on restart. If you don't, turn it on under **Settings → Bot protection** and set a per-service bot mode from each service's Manage panel.
+
+To test the change, point ZAP's browser-driven scan at a protected service before and after upgrading. The old build gives it a session. The new build loops on the challenge and eventually bans the scanner if it keeps running.
+
+Full details are in the [Bot Protection & Fingerprinting](/docs/security/bot-and-fingerprinting) docs. Questions or a bypass I've missed? Open an issue on [GitLab](https://gitlab.com/sinhaparth5/coraza-waf-mod/issues).

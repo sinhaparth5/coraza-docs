@@ -1,10 +1,15 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
+import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./global.css";
 
 const manrope = Manrope({
   subsets: ["latin"],
 });
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://waf.astrareconslabs.com"),
+};
 
 export default function Layout({ children }: LayoutProps<"/">) {
   return (

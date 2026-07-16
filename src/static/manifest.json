@@ -1,0 +1,29 @@
+{
+  "name": "Coraza WAF Mod",
+  "short_name": "Coraza WAF",
+  "description": "One binary. Full WAF protection. A reverse proxy with OWASP CRS, live dashboard, IP and geo blocking, and TLS termination.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#2b5c74",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/img/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/img/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

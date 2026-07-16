@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Point crawlers to the sitemap
+Sitemap: https://waf.astrareconslabs.com/sitemap.xml

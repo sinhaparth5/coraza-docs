@@ -1,16 +1,28 @@
-import Link from 'next/link';
+import type { Metadata } from "next";
+import {
+  ArchitectureSection,
+  DashboardSection,
+  FeaturesSection,
+  HeroSection,
+  InstallSection,
+  StatsSection,
+} from "@/components/home";
+
+export const metadata: Metadata = {
+  title: "Coraza WAF and reverse proxy in a single Go binary",
+  description:
+    "Coraza WAF Mod combines OWASP CRS inspection, reverse proxy routing, TLS, and an admin dashboard without Docker or an external database.",
+};
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col justify-center text-center flex-1">
-      <h1 className="text-2xl font-bold mb-4">Hello World</h1>
-      <p>
-        You can open{' '}
-        <Link href="/docs" className="font-medium underline">
-          /docs
-        </Link>{' '}
-        and see the documentation.
-      </p>
-    </div>
+    <>
+      <HeroSection />
+      <DashboardSection />
+      <StatsSection />
+      <FeaturesSection />
+      <ArchitectureSection />
+      <InstallSection />
+    </>
   );
 }

@@ -2,6 +2,7 @@
 sidebar_position: 6
 title: Trusted Proxy & Real Client IP
 description: How the real client IP is resolved for blocking, geo, rate limiting, and logging — and why forwarded headers are not trusted by default.
+keywords: [trusted proxy, real client ip, x-forwarded-for, cloudflare]
 ---
 
 

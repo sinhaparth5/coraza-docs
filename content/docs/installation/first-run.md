@@ -2,6 +2,7 @@
 sidebar_position: 3
 title: First Run & Initial Setup
 description: Seed the first admin account, start the server, and open the dashboard.
+keywords: [first run, initial setup, admin account, setup command]
 ---
 
 
@@ -15,10 +16,9 @@ For a **manual / source install**:
    printf 'your-strong-password\n' | ./coraza-waf-mod setup \
      --db ./waf.db --admin-email you@example.com
    ```
-   :::warning[Default dev credentials are insecure]
-   If you start the server **without** running `setup`, a development fallback admin
-   (`admin@localhost` / `admin123`) is seeded and printed in the logs. **Do not rely on this in
-   production** — always run `setup` to create real credentials and change the default.
+   :::warning[Setup is required]
+   The server never creates fallback credentials. If `setup` has not been run, proxying still works
+   but every dashboard login is rejected until an administrator exists.
    :::
 2. **Start the server:**
    ```bash

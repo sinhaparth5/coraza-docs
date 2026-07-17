@@ -1,18 +1,17 @@
 "use client";
 
-import type { Variants } from "motion/react";
-import { motion, useAnimation } from "motion/react";
-import type { HTMLAttributes } from "react";
+import type { HTMLMotionProps, Variants } from "motion/react";
+import { motion, useAnimation, useReducedMotion } from "motion/react";
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 export interface ActivityIconHandle {
   startAnimation: () => void;
   stopAnimation: () => void;
 }
 
-interface ActivityIconProps extends HTMLAttributes<HTMLDivElement> {
+interface ActivityIconProps extends HTMLMotionProps<"div"> {
   size?: number;
 }
 
@@ -41,13 +40,15 @@ const VARIANTS: Variants = {
 const ActivityIcon = forwardRef<ActivityIconHandle, ActivityIconProps>(
   ({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
     const controls = useAnimation();
+    const shouldReduceMotion = useReducedMotion();
     const isControlledRef = useRef(false);
 
     useImperativeHandle(ref, () => {
       isControlledRef.current = true;
 
       return {
-        startAnimation: () => controls.start("animate"),
+        startAnimation: () =>
+          controls.start(shouldReduceMotion ? "normal" : "animate"),
         stopAnimation: () => controls.start("normal"),
       };
     });
@@ -57,10 +58,10 @@ const ActivityIcon = forwardRef<ActivityIconHandle, ActivityIconProps>(
         if (isControlledRef.current) {
           onMouseEnter?.(e);
         } else {
-          controls.start("animate");
+          controls.start(shouldReduceMotion ? "normal" : "animate");
         }
       },
-      [controls, onMouseEnter]
+      [controls, onMouseEnter, shouldReduceMotion],
     );
 
     const handleMouseLeave = useCallback(
@@ -71,17 +72,18 @@ const ActivityIcon = forwardRef<ActivityIconHandle, ActivityIconProps>(
           controls.start("normal");
         }
       },
-      [controls, onMouseLeave]
+      [controls, onMouseLeave],
     );
 
     return (
-      <div
+      <motion.div
         className={cn(className)}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         {...props}
       >
         <svg
+          aria-hidden="true"
           fill="none"
           height={size}
           stroke="currentColor"
@@ -99,9 +101,9 @@ const ActivityIcon = forwardRef<ActivityIconHandle, ActivityIconProps>(
             variants={VARIANTS}
           />
         </svg>
-      </div>
+      </motion.div>
     );
-  }
+  },
 );
 
 ActivityIcon.displayName = "ActivityIcon";

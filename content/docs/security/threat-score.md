@@ -2,6 +2,7 @@
 sidebar_position: 4
 title: Threat Score & Adaptive Enforcement
 description: A composite 0–100 per-IP risk score combining autoban, bot, ASN, geo, and JA4 signals, with optional automatic rate-limit scaling and forced bot challenges.
+keywords: [threat score, adaptive enforcement, risk scoring, ip reputation]
 ---
 
 

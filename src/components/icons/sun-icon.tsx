@@ -1,18 +1,17 @@
 "use client";
 
-import type { Variants } from "motion/react";
-import { motion, useAnimation } from "motion/react";
-import type { HTMLAttributes } from "react";
+import type { HTMLMotionProps, Variants } from "motion/react";
+import { motion, useAnimation, useReducedMotion } from "motion/react";
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 export interface SunIconHandle {
   startAnimation: () => void;
   stopAnimation: () => void;
 }
 
-interface SunIconProps extends HTMLAttributes<HTMLDivElement> {
+interface SunIconProps extends HTMLMotionProps<"div"> {
   size?: number;
 }
 
@@ -27,13 +26,15 @@ const PATH_VARIANTS: Variants = {
 const SunIcon = forwardRef<SunIconHandle, SunIconProps>(
   ({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
     const controls = useAnimation();
+    const shouldReduceMotion = useReducedMotion();
     const isControlledRef = useRef(false);
 
     useImperativeHandle(ref, () => {
       isControlledRef.current = true;
 
       return {
-        startAnimation: () => controls.start("animate"),
+        startAnimation: () =>
+          controls.start(shouldReduceMotion ? "normal" : "animate"),
         stopAnimation: () => controls.start("normal"),
       };
     });
@@ -43,10 +44,10 @@ const SunIcon = forwardRef<SunIconHandle, SunIconProps>(
         if (isControlledRef.current) {
           onMouseEnter?.(e);
         } else {
-          controls.start("animate");
+          controls.start(shouldReduceMotion ? "normal" : "animate");
         }
       },
-      [controls, onMouseEnter]
+      [controls, onMouseEnter, shouldReduceMotion],
     );
 
     const handleMouseLeave = useCallback(
@@ -57,16 +58,17 @@ const SunIcon = forwardRef<SunIconHandle, SunIconProps>(
           controls.start("normal");
         }
       },
-      [controls, onMouseLeave]
+      [controls, onMouseLeave],
     );
     return (
-      <div
+      <motion.div
         className={cn(className)}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         {...props}
       >
         <svg
+          aria-hidden="true"
           fill="none"
           height={size}
           stroke="currentColor"
@@ -97,9 +99,9 @@ const SunIcon = forwardRef<SunIconHandle, SunIconProps>(
             />
           ))}
         </svg>
-      </div>
+      </motion.div>
     );
-  }
+  },
 );
 
 SunIcon.displayName = "SunIcon";

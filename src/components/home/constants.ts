@@ -17,10 +17,66 @@ export const stats = [
   },
 ];
 
+export const footerLinks: {
+  heading: string;
+  links: { label: string; href: string; external?: boolean }[];
+}[] = [
+  {
+    heading: "Product",
+    links: [
+      { label: "Introduction", href: "/docs/intro" },
+      { label: "Architecture", href: "/docs/overview/architecture" },
+      { label: "Installation", href: "/docs/installation/install" },
+      { label: "Admin dashboard", href: "/docs/configuration/dashboard" },
+    ],
+  },
+  {
+    heading: "Security",
+    links: [
+      { label: "WAF rules", href: "/docs/security/waf" },
+      {
+        label: "Bot protection",
+        href: "/docs/security/bot-and-fingerprinting",
+      },
+      { label: "Rate limiting", href: "/docs/configuration/rate-limiting" },
+      { label: "Threat score", href: "/docs/security/threat-score" },
+    ],
+  },
+  {
+    heading: "Resources",
+    links: [
+      { label: "Blog", href: "/blog" },
+      { label: "FAQ", href: "/docs/faq" },
+      { label: "Troubleshooting", href: "/docs/troubleshooting" },
+      { label: "GitHub", href: GITHUB_URL, external: true },
+    ],
+  },
+];
+
 export const pipeline = [
-  "Bot challenge gate with JS proof-of-work",
-  "IP blocklist and token-bucket rate limiting",
-  "GeoIP2 country check against bundled database",
-  "Coraza WAF inspection with OWASP CRS 4.x",
-  "Reverse proxy with prefix strip or host routing",
+  {
+    stage: "01",
+    title: "Bot gate",
+    detail: "JS proof-of-work turns away headless clients early.",
+  },
+  {
+    stage: "02",
+    title: "Rate & IP policy",
+    detail: "Token-bucket limits and IP blocklists throttle abuse per client.",
+  },
+  {
+    stage: "03",
+    title: "Geo policy",
+    detail: "Country allow or deny, resolved from the bundled GeoIP2 database.",
+  },
+  {
+    stage: "04",
+    title: "WAF inspection",
+    detail: "OWASP CRS 4.x rules catch SQLi, XSS, RCE, and path traversal.",
+  },
+  {
+    stage: "05",
+    title: "Routing",
+    detail: "Host or prefix match forwards what survives to your backend.",
+  },
 ];

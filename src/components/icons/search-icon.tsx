@@ -1,30 +1,32 @@
 "use client";
 
-import { motion, useAnimation } from "motion/react";
-import type { HTMLAttributes } from "react";
+import type { HTMLMotionProps } from "motion/react";
+import { motion, useAnimation, useReducedMotion } from "motion/react";
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 export interface SearchIconHandle {
   startAnimation: () => void;
   stopAnimation: () => void;
 }
 
-interface SearchIconProps extends HTMLAttributes<HTMLDivElement> {
+interface SearchIconProps extends HTMLMotionProps<"div"> {
   size?: number;
 }
 
 const SearchIcon = forwardRef<SearchIconHandle, SearchIconProps>(
   ({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
     const controls = useAnimation();
+    const shouldReduceMotion = useReducedMotion();
     const isControlledRef = useRef(false);
 
     useImperativeHandle(ref, () => {
       isControlledRef.current = true;
 
       return {
-        startAnimation: () => controls.start("animate"),
+        startAnimation: () =>
+          controls.start(shouldReduceMotion ? "normal" : "animate"),
         stopAnimation: () => controls.start("normal"),
       };
     });
@@ -34,10 +36,10 @@ const SearchIcon = forwardRef<SearchIconHandle, SearchIconProps>(
         if (isControlledRef.current) {
           onMouseEnter?.(e);
         } else {
-          controls.start("animate");
+          controls.start(shouldReduceMotion ? "normal" : "animate");
         }
       },
-      [controls, onMouseEnter]
+      [controls, onMouseEnter, shouldReduceMotion],
     );
 
     const handleMouseLeave = useCallback(
@@ -48,17 +50,18 @@ const SearchIcon = forwardRef<SearchIconHandle, SearchIconProps>(
           controls.start("normal");
         }
       },
-      [controls, onMouseLeave]
+      [controls, onMouseLeave],
     );
 
     return (
-      <div
+      <motion.div
         className={cn(className)}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         {...props}
       >
         <motion.svg
+          aria-hidden="true"
           animate={controls}
           fill="none"
           height={size}
@@ -84,9 +87,9 @@ const SearchIcon = forwardRef<SearchIconHandle, SearchIconProps>(
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.3-4.3" />
         </motion.svg>
-      </div>
+      </motion.div>
     );
-  }
+  },
 );
 
 SearchIcon.displayName = "SearchIcon";

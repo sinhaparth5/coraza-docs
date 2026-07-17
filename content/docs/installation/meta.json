@@ -1,5 +1,12 @@
 {
   "title": "Installation",
   "description": "Requirements, installation, first run, systemd, upgrades, and releases.",
-  "pages": ["requirements", "install", "first-run", "systemd", "upgrading", "building"]
+  "pages": [
+    "requirements",
+    "install",
+    "first-run",
+    "systemd",
+    "upgrading",
+    "building"
+  ]
 }

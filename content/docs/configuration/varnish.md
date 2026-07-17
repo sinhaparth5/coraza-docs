@@ -2,6 +2,7 @@
 sidebar_position: 8
 title: Varnish Cache Integration
 description: Route selected services through a Varnish cache behind the WAF, using loopback listeners to keep all traffic in the inspection pipeline.
+keywords: [varnish cache, caching, reverse proxy cache, cache tuning]
 ---
 
 
@@ -23,7 +24,7 @@ Nothing reaches Varnish or the backend without first passing the full WAF pipeli
   with no restart (`POST /admin/settings/varnish` with `varnish_enabled`, `varnish_addr`). While off,
   every service proxies straight to its backend even if individually marked cacheable.
 
-:::warning The Varnish listen address must be a loopback address
+:::warning[The Varnish listen address must be a loopback address]
 `varnish_addr` is validated: anything that is not a loopback address is rejected outright, because
 that port would let clients reach Varnish (and the backend) without passing through the WAF pipeline.
 :::

@@ -4,6 +4,7 @@
   "pages": [
     "cli",
     "dashboard",
+    "rest-api",
     "tls",
     "rate-limiting",
     "log-retention",

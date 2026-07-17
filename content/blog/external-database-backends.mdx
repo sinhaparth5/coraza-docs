@@ -1,0 +1,82 @@
+---
+slug: external-database-backends
+date: 2026-07-17
+title: "MySQL, Postgres, and a Safer Way to Build a DSN"
+authors: [parth]
+tags: [database, release, go]
+description: Coraza WAF Mod v1.6.0 adds MySQL/MariaDB and Postgres-compatible database backends, plus a migration path and a safer way to build connection strings.
+image: /img/seo_image.jpg
+keywords: [coraza, waf, mysql, postgres, mariadb, cockroachdb, database, dsn, migration, go]
+---
+
+Coraza WAF Mod has been SQLite-only since the first release. As of v1.6.0, it also runs on MySQL/MariaDB and Postgres-compatible servers, including CockroachDB and Neon.
+
+{/* truncate */}
+
+## Why bother with more than one database
+
+SQLite is still the default, and I'm not planning to change that. One file, no separate process to run, no connection pool to tune. For a single-node WAF sitting in front of a handful of backends, it's the right amount of infrastructure: none.
+
+The requests to support something else came from a specific shape of deployment: multiple WAF instances behind a load balancer, sharing state, where a single SQLite file on one node isn't an option. [Issue #50](https://github.com/sinhaparth5/coraza-waf-mod/issues/50) asked for it directly. Redis already covers shared rate-limit state for that setup; the missing piece was everywhere else: services, IP rules, WAF exceptions, certificates, threat scores.
+
+## One query layer, three dialects
+
+The internal storage package has one set of query methods. Before this release, every one of them assumed SQLite's SQL dialect. Adding MySQL and Postgres without duplicating that whole layer meant finding the actual differences and isolating them, rather than the differences I expected going in.
+
+The real gaps were narrower than they looked: DDL column types (`INTEGER PRIMARY KEY AUTOINCREMENT` vs `SERIAL` vs `BIGSERIAL`), upsert syntax (`INSERT OR REPLACE` vs `ON DUPLICATE KEY UPDATE` vs `ON CONFLICT DO UPDATE`), whether an index-creation statement is naturally idempotent, and MySQL's key-length limit on `TEXT`-typed index columns, which SQLite and Postgres don't enforce at all. A small dialect layer covers those four things. Every query method above it is written once and runs unmodified against all three backends.
+
+Both new drivers are pure Go: no `libmysqlclient`, no `libpq`. `CGO_ENABLED=0` cross-compiles are unaffected, so the release binaries build exactly the way they did before.
+
+## Picking a backend
+
+```bash
+./coraza-waf-mod \
+  --db-driver postgres \
+  --db "postgres://coraza:secret@db.example.com:5432/coraza?sslmode=require"
+```
+
+`--db-driver` accepts `sqlite` (default), `mysql`/`mariadb`, and `postgres` with `postgresql`, `cockroachdb`, and `neon` as aliases for the same driver. CockroachDB and Neon both speak the Postgres wire protocol, so there was no reason to write a fourth dialect for them. The schema is created automatically on first connection and upgraded automatically on every backend, same as SQLite always did.
+
+The database backend is chosen once, at process start. Switching it is a restart, not a dashboard toggle, and that's on purpose. Everything else in the WAF hot-reloads; the connection the whole storage layer is built on does not.
+
+## Testing against the real thing
+
+A dialect layer that's only ever run against SQLite in CI is a dialect layer nobody's tested. The full `internal/storage` test suite now runs against all three backends (live MySQL 8 and Postgres 16, not mocks) through a `TEST_DB_DRIVER` / `TEST_DB_DSN` harness and a `docker-compose.test.yml` that spins up both servers. A new `test-external-db` job in the CI matrix gates every release on it, so a MySQL-specific upsert bug can't ship because someone only ran the suite locally against SQLite.
+
+## Building a DSN without leaking the password
+
+Connecting to an external database needs a DSN, and DSNs contain passwords. `install.sh` needed a way to build one from a username, host, and password without passing that password as a CLI argument: an argv value sits in `/proc/<pid>/cmdline`, readable by every local user for as long as the process runs, and lands in shell history the moment someone types it interactively.
+
+```bash
+printf '%s\n' "$DB_PASSWORD" | coraza-waf-mod build-dsn \
+  --driver postgres --host db.example.com --port 5432 \
+  --username coraza --dbname coraza --sslmode require
+```
+
+`build-dsn` reads the password from stdin, escapes it correctly for the target driver (a `:` or `@` in a password used to be able to corrupt an unescaped connection string), and prints the finished DSN. CodeQL flagged the argv version of this on the pre-release branch before it ever shipped, which is exactly the kind of thing that scan exists to catch. `setup` has used the same stdin convention for the admin password since the first release; this just extends it to the second secret the installer now has to handle.
+
+## Moving an existing install off SQLite
+
+If you're already running Coraza WAF Mod on SQLite and want to move to Postgres, the **Database connection** card on the Settings page builds a connection from structured fields or accepts a raw DSN, either way. **Test connection** does a five-second dial and ping without touching the live server, so you can confirm reachability before committing to anything.
+
+**Migrate configuration here** then copies services, rules, settings, secrets (re-encrypted for the target if `--db-key-file` is in use), certificates, and API keys into the new, empty database. Request logs, sessions, and rate-limit state are deliberately left behind. None of that is worth migrating, and dragging it along would make the migration slower for no benefit. The source database is never touched, so if something looks wrong on the target you still have a working SQLite file to fall back to.
+
+One thing the migration doesn't do: switch the running process. It writes the configuration to the new backend and shows you the `--db-driver` / `--db` flags to restart with. The live server keeps talking to SQLite until you actually restart it with those flags.
+
+## Vacuuming three different databases
+
+`prune --vacuum` already reclaimed space on SQLite by rebuilding the file and truncating the WAL, with a before/after size report. That doesn't generalize to the other two:
+
+| Backend | What `--vacuum` does |
+|---|---|
+| SQLite | Full rebuild + WAL truncate, reports size before and after |
+| Postgres | Runs Postgres's own in-place `VACUUM` |
+| MySQL | Documented no-op (MySQL has no database-wide equivalent) |
+
+Rather than pretend `--vacuum` means the same thing everywhere, `prune` now checks the active driver and does the right thing for it, including doing nothing on MySQL rather than failing or silently skipping without saying so.
+
+## Upgrading
+
+Fresh installs get an external-database prompt in `install.sh`: pick SQLite (the default) or hand over MySQL/MariaDB or Postgres connection details, and the installer calls `build-dsn` under the hood. Existing installs are untouched by this release: re-running the installer to upgrade the binary keeps whatever backend the systemd unit is already pointed at. Nothing switches automatically.
+
+If you want to move an existing SQLite deployment to an external database, do it through the Settings card above rather than editing the systemd unit by hand. The migration step is what actually copies your configuration over.

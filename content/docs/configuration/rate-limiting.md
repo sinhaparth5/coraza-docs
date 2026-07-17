@@ -2,6 +2,7 @@
 sidebar_position: 4
 title: Rate Limiting
 description: Per-IP token-bucket limiting with an in-process or Redis backend, plus per-service limits.
+keywords: [rate limiting, token bucket, redis, per-ip limiting]
 ---
 
 

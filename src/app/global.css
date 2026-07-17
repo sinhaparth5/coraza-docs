@@ -3,53 +3,117 @@
 @import "fumadocs-ui/css/preset.css";
 
 @theme {
-  --color-pastel-green-50: #f2fdf0;
-  --color-pastel-green-100: #e0fbdd;
-  --color-pastel-green-200: #c3f5bd;
-  --color-pastel-green-300: #92ec89;
-  --color-pastel-green-400: #64dc58;
-  --color-pastel-green-500: #34c126;
-  --color-pastel-green-600: #269f1a;
-  --color-pastel-green-700: #207d18;
-  --color-pastel-green-800: #1e6318;
-  --color-pastel-green-900: #195116;
-  --color-pastel-green-950: #082d06;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading:
+    var(--font-clash-grotesk), ui-sans-serif, system-ui, sans-serif;
 
-  --color-fd-background: #f2fdf0;
-  --color-fd-foreground: #082d06;
-  --color-fd-muted: #e0fbdd;
-  --color-fd-muted-foreground: #1e6318;
+  /* Cool, low-chroma neutral family — carries backgrounds, surfaces, and body
+     text so large areas of the UI stay calm instead of vivid. */
+  --color-sinbad-50: oklch(97.81% 0.01 182.66);
+  --color-sinbad-100: oklch(93.19% 0.02 176.73);
+  --color-sinbad-200: oklch(83.27% 0.05 177.88);
+  --color-sinbad-300: oklch(76.92% 0.06 179.43);
+  --color-sinbad-400: oklch(66.82% 0.07 180.77);
+  --color-sinbad-500: oklch(58.10% 0.07 180.99);
+  --color-sinbad-600: oklch(49.37% 0.06 183.49);
+  --color-sinbad-700: oklch(42.99% 0.05 184.3);
+  --color-sinbad-800: oklch(37.50% 0.04 185.72);
+  --color-sinbad-900: oklch(33.86% 0.03 186.22);
+  --color-sinbad-950: oklch(23.91% 0.03 186.96);
+
+  /* Muted brand-green accent family — reserved for primary actions, focus
+     rings, and small highlights, so green still reads as "brand" without
+     the old scale's high chroma (was up to 0.22, now capped at 0.12). */
+  --color-pixie-green-50: oklch(97.70% 0.01 145.27);
+  --color-pixie-green-100: oklch(95.01% 0.02 147.37);
+  --color-pixie-green-200: oklch(89.93% 0.04 147.33);
+  --color-pixie-green-300: oklch(85.03% 0.06 147.28);
+  --color-pixie-green-400: oklch(70.95% 0.1 146.28);
+  --color-pixie-green-500: oklch(61.13% 0.12 145.83);
+  --color-pixie-green-600: oklch(52.51% 0.1 145.69);
+  --color-pixie-green-700: oklch(44.86% 0.08 145.97);
+  --color-pixie-green-800: oklch(38.94% 0.06 146.32);
+  --color-pixie-green-900: oklch(34.60% 0.05 146.96);
+  --color-pixie-green-950: oklch(23.18% 0.04 147.06);
+
+  /* pastel-green is the legacy token name still used across the marketing
+     components; alias it to pixie-green so every existing usage picks up
+     the softer palette without a class-by-class rewrite. */
+  --color-pastel-green-50: var(--color-pixie-green-50);
+  --color-pastel-green-100: var(--color-pixie-green-100);
+  --color-pastel-green-200: var(--color-pixie-green-200);
+  --color-pastel-green-300: var(--color-pixie-green-300);
+  --color-pastel-green-400: var(--color-pixie-green-400);
+  --color-pastel-green-500: var(--color-pixie-green-500);
+  --color-pastel-green-600: var(--color-pixie-green-600);
+  --color-pastel-green-700: var(--color-pixie-green-700);
+  --color-pastel-green-800: var(--color-pixie-green-800);
+  --color-pastel-green-900: var(--color-pixie-green-900);
+  --color-pastel-green-950: var(--color-pixie-green-950);
+
+  --color-fd-background: var(--color-sinbad-50);
+  --color-fd-foreground: var(--color-sinbad-950);
+  --color-fd-muted: var(--color-sinbad-100);
+  --color-fd-muted-foreground: var(--color-sinbad-700);
   --color-fd-popover: #ffffff;
-  --color-fd-popover-foreground: #082d06;
+  --color-fd-popover-foreground: var(--color-sinbad-950);
   --color-fd-card: #ffffff;
-  --color-fd-card-foreground: #082d06;
-  --color-fd-border: color-mix(in srgb, #269f1a 24%, transparent);
-  --color-fd-primary: #207d18;
+  --color-fd-card-foreground: var(--color-sinbad-950);
+  --color-fd-border: color-mix(
+    in oklch,
+    var(--color-sinbad-500) 20%,
+    transparent
+  );
+  --color-fd-primary: var(--color-pixie-green-600);
   --color-fd-primary-foreground: #ffffff;
-  --color-fd-secondary: #e0fbdd;
-  --color-fd-secondary-foreground: #195116;
-  --color-fd-accent: #c3f5bd;
-  --color-fd-accent-foreground: #195116;
-  --color-fd-ring: #34c126;
+  --color-fd-secondary: var(--color-sinbad-100);
+  --color-fd-secondary-foreground: var(--color-sinbad-900);
+  --color-fd-accent: var(--color-pixie-green-100);
+  --color-fd-accent-foreground: var(--color-pixie-green-900);
+  --color-fd-ring: var(--color-pixie-green-500);
 }
 
 .dark {
-  --color-fd-background: #082d06;
-  --color-fd-foreground: #f2fdf0;
-  --color-fd-muted: color-mix(in srgb, #195116 72%, #082d06);
-  --color-fd-muted-foreground: #c3f5bd;
-  --color-fd-popover: color-mix(in srgb, #195116 58%, #082d06);
-  --color-fd-popover-foreground: #f2fdf0;
-  --color-fd-card: color-mix(in srgb, #195116 38%, #082d06);
-  --color-fd-card-foreground: #f2fdf0;
-  --color-fd-border: color-mix(in srgb, #92ec89 24%, transparent);
-  --color-fd-primary: #92ec89;
-  --color-fd-primary-foreground: #082d06;
-  --color-fd-secondary: color-mix(in srgb, #195116 70%, #082d06);
-  --color-fd-secondary-foreground: #e0fbdd;
-  --color-fd-accent: color-mix(in srgb, #207d18 68%, #082d06);
-  --color-fd-accent-foreground: #f2fdf0;
-  --color-fd-ring: #64dc58;
+  --color-fd-background: var(--color-sinbad-950);
+  --color-fd-foreground: var(--color-sinbad-50);
+  --color-fd-muted: color-mix(
+    in oklch,
+    var(--color-sinbad-900) 72%,
+    var(--color-sinbad-950)
+  );
+  --color-fd-muted-foreground: var(--color-sinbad-200);
+  --color-fd-popover: color-mix(
+    in oklch,
+    var(--color-sinbad-900) 58%,
+    var(--color-sinbad-950)
+  );
+  --color-fd-popover-foreground: var(--color-sinbad-50);
+  --color-fd-card: color-mix(
+    in oklch,
+    var(--color-sinbad-900) 38%,
+    var(--color-sinbad-950)
+  );
+  --color-fd-card-foreground: var(--color-sinbad-50);
+  --color-fd-border: color-mix(
+    in oklch,
+    var(--color-pixie-green-300) 20%,
+    transparent
+  );
+  --color-fd-primary: var(--color-pixie-green-300);
+  --color-fd-primary-foreground: var(--color-sinbad-950);
+  --color-fd-secondary: color-mix(
+    in oklch,
+    var(--color-sinbad-900) 70%,
+    var(--color-sinbad-950)
+  );
+  --color-fd-secondary-foreground: var(--color-sinbad-100);
+  --color-fd-accent: color-mix(
+    in oklch,
+    var(--color-pixie-green-700) 55%,
+    var(--color-sinbad-950)
+  );
+  --color-fd-accent-foreground: var(--color-sinbad-50);
+  --color-fd-ring: var(--color-pixie-green-400);
 }
 
 html {
@@ -59,6 +123,15 @@ html {
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
 }
 
 html > body[data-scroll-locked] {

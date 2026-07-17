@@ -2,6 +2,7 @@
 sidebar_position: 9
 title: Daily Report & Ban Alert Emails
 description: Daily traffic digest and instant autoban alert emails sent via Cloudflare Email Service — only the recipient list and API token are configurable.
+keywords: [email alerts, daily report, ban alert, cloudflare email]
 ---
 
 

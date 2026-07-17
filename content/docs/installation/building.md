@@ -2,6 +2,7 @@
 sidebar_position: 6
 title: Building & Releasing
 description: Make targets for building, testing, cross-compiling, and tagging releases.
+keywords: [build from source, go build, make, cross compile, release]
 ---
 
 
@@ -12,13 +13,13 @@ make test        # go test ./...
 make clean       # remove binary, minified JS, dist/
 make dist        # cross-compile linux/amd64 + linux/arm64 + windows/amd64 (CGO_ENABLED=0)
 make checksums   # sha256sum dist/* → dist/checksums.txt
-make tag VERSION=v1.0.0   # annotated git tag + push (triggers the GitLab release pipeline)
+make tag VERSION=v1.0.0   # annotated git tag + push (triggers the GitHub Actions release workflow)
 ```
 
 Run a single package's tests:
 
 ```bash
-go test ./proxy/ -run TestName -v
+go test ./internal/proxy -run TestName -v
 ```
 
 :::warning[Always use make build after editing JS]

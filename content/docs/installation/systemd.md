@@ -2,6 +2,7 @@
 sidebar_position: 4
 title: Running as a systemd Service
 description: The systemd unit the installer writes, and common service operations.
+keywords: [systemd, service, linux, execstart, journalctl]
 ---
 
 
@@ -18,7 +19,9 @@ User=coraza-waf-mod
 Group=coraza-waf-mod
 WorkingDirectory=/var/lib/coraza-waf-mod
 ExecStart=/usr/local/bin/coraza-waf-mod --listen :80 --listen-tls :443 \
-  --db /var/lib/coraza-waf-mod/waf.db --certs /var/lib/coraza-waf-mod/certs --retention 30
+  --db-driver sqlite --db '/var/lib/coraza-waf-mod/waf.db' \
+  --certs /var/lib/coraza-waf-mod/certs --retention 30 \
+  --db-key-file /etc/coraza-waf-mod/db.key
 Restart=on-failure
 RestartSec=5s
 

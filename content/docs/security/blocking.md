@@ -2,6 +2,7 @@
 sidebar_position: 2
 title: IP & Geo Blocking
 description: Manual IP allow/block rules, automatic IP banning, and bundled GeoLite2 country blocking — all enforced early and hot-reloaded.
+keywords: [ip blocking, geo blocking, autoban, automatic ip banning, maxmind]
 ---
 
 

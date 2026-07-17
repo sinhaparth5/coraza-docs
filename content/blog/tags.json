@@ -23,5 +23,9 @@
   "bot-protection": {
     "label": "Bot Protection",
     "description": "Bot detection, JS challenges, and defeating automated scanners."
+  },
+  "database": {
+    "label": "Database",
+    "description": "Storage backends, migrations, and database-layer engineering."
   }
 }

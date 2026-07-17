@@ -2,6 +2,7 @@
 sidebar_position: 5
 title: Log Retention & Pruning
 description: How request logs are pruned by a separate one-shot command or the bundled systemd timer.
+keywords: [log retention, pruning, request logs, systemd timer]
 ---
 
 

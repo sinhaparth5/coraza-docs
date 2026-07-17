@@ -2,6 +2,7 @@
 sidebar_position: 6
 title: Access Log
 description: An optional nginx-combined-format access log file, plus a live terminal view in the dashboard.
+keywords: [access log, nginx log format, live terminal, sse]
 ---
 
 

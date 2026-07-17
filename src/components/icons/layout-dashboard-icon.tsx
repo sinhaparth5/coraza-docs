@@ -1,32 +1,34 @@
 "use client";
 
-import { motion, useAnimation } from "motion/react";
-import type { HTMLAttributes } from "react";
+import type { HTMLMotionProps } from "motion/react";
+import { motion, useAnimation, useReducedMotion } from "motion/react";
 import { forwardRef, useCallback, useImperativeHandle, useRef } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
-export interface LayoutPanelTopIconHandle {
+export interface LayoutDashboardIconHandle {
   startAnimation: () => void;
   stopAnimation: () => void;
 }
 
-interface LayoutPanelTopIconProps extends HTMLAttributes<HTMLDivElement> {
+interface LayoutDashboardIconProps extends HTMLMotionProps<"div"> {
   size?: number;
 }
 
-const LayoutPanelTopIcon = forwardRef<
-  LayoutPanelTopIconHandle,
-  LayoutPanelTopIconProps
+const LayoutDashboardIcon = forwardRef<
+  LayoutDashboardIconHandle,
+  LayoutDashboardIconProps
 >(({ onMouseEnter, onMouseLeave, className, size = 28, ...props }, ref) => {
   const controls = useAnimation();
+  const shouldReduceMotion = useReducedMotion();
   const isControlledRef = useRef(false);
 
   useImperativeHandle(ref, () => {
     isControlledRef.current = true;
 
     return {
-      startAnimation: () => controls.start("animate"),
+      startAnimation: () =>
+        controls.start(shouldReduceMotion ? "normal" : "animate"),
       stopAnimation: () => controls.start("normal"),
     };
   });
@@ -36,10 +38,10 @@ const LayoutPanelTopIcon = forwardRef<
       if (isControlledRef.current) {
         onMouseEnter?.(e);
       } else {
-        controls.start("animate");
+        controls.start(shouldReduceMotion ? "normal" : "animate");
       }
     },
-    [controls, onMouseEnter]
+    [controls, onMouseEnter, shouldReduceMotion],
   );
 
   const handleMouseLeave = useCallback(
@@ -50,17 +52,18 @@ const LayoutPanelTopIcon = forwardRef<
         controls.start("normal");
       }
     },
-    [controls, onMouseLeave]
+    [controls, onMouseLeave],
   );
 
   return (
-    <div
+    <motion.div
       className={cn(className)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       {...props}
     >
       <svg
+        aria-hidden="true"
         fill="none"
         height={size}
         stroke="currentColor"
@@ -134,10 +137,10 @@ const LayoutPanelTopIcon = forwardRef<
           y="14"
         />
       </svg>
-    </div>
+    </motion.div>
   );
 });
 
-LayoutPanelTopIcon.displayName = "LayoutPanelTopIcon";
+LayoutDashboardIcon.displayName = "LayoutDashboardIcon";
 
-export { LayoutPanelTopIcon };
+export { LayoutDashboardIcon };

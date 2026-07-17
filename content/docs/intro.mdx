@@ -1,0 +1,51 @@
+---
+slug: /intro
+sidebar_position: 1
+title: What It Does
+description: A single-binary Web Application Firewall and reverse proxy for Linux, built on Coraza v3 and the OWASP Core Rule Set.
+keywords: [coraza waf mod, web application firewall, reverse proxy, owasp crs, go, single binary, admin dashboard, mysql, postgres]
+---
+
+
+A single-binary **Web Application Firewall + reverse proxy** for Linux, built in Go on top of
+[Coraza v3](https://github.com/corazawaf/coraza) (OWASP Core Rule Set) with a built-in
+HTMX/Tailwind admin dashboard. There is **no Docker, database-server, or Node.js requirement**:
+SQLite is the default, while MySQL/MariaDB and Postgres-compatible databases are available for
+deployments that need an external store.
+
+![Coraza WAF Mod Architecture: User Request → Cloudflare → OS Firewall → Coraza WAF Proxy (with SQLite waf.db and HTMX/Tailwind Admin Dashboard) → Application Service](/img/arch_diagram_white-bg.png)
+
+## What it does
+
+Coraza WAF Mod sits in front of one or more backend web applications and inspects every incoming
+HTTP request before it is allowed to reach a backend. For each request it runs an ordered
+pipeline of defensive checks — IP blocklist, geo blocking, bot challenge, rate limiting, and full
+WAF rule inspection — and only then reverse-proxies the request to the matching backend. Every
+decision (blocked or allowed) is logged asynchronously to the configured database. Most policy and
+routing changes are managed live from the built-in dashboard; startup concerns such as the database
+connection remain CLI-controlled.
+
+It is designed to be **operationally boring**: a single statically-linked binary, SQLite by default,
+a systemd unit, and an optional prune timer. Services, rules, TLS, bot settings, and rate limits are
+configured through the dashboard and stored in the database. The database backend itself is a
+startup choice and requires a restart to change.
+
+## What's inside
+
+<Cards>
+<Card title="WAF inspection" description="Coraza v3 + OWASP CRS compiled in; blocks SQLi, XSS, RCE, path traversal, and scanners out of the box." href="/docs/security/waf" />
+<Card title="Reverse proxy & multi-app routing" description="Host- and prefix-based routing to many backends from one front door, hot-reloaded with no restart." href="/docs/overview/architecture" />
+<Card title="IP & geo blocking" description="Manual allow/block rules, automatic IP banning, and bundled GeoLite2 country blocking." href="/docs/security/blocking" />
+<Card title="Rate limiting" description="Per-IP token bucket, in-process or Redis-backed for multi-node." href="/docs/configuration/rate-limiting" />
+<Card title="Bot protection" description="Header-based scoring with a JavaScript proof-of-work challenge, plus JA4 TLS fingerprinting and ASN lookup." href="/docs/security/bot-and-fingerprinting" />
+<Card title="Threat-intel auto-sync & webhooks" description="Pull external IP blocklists and forward events." href="/docs/security/threat-intel-webhooks" />
+<Card title="Threat score & adaptive enforcement" description="A composite 0-100 per-IP risk score that can automatically tighten rate limits or force a bot challenge for high-risk clients." href="/docs/security/threat-score" />
+<Card title="Varnish caching" description="An optional per-service cache behind the WAF, so nothing reaches the cache or backend without passing the full pipeline." href="/docs/configuration/varnish" />
+<Card title="Email alerts" description="Daily traffic digest and instant ban-alert emails when the autoban engine blocks a new IP." />
+<Card title="TLS / HTTPS" description="Plain HTTP, automatic Let's Encrypt, or your own certs, mixable per service." href="/docs/configuration/tls" />
+<Card title="Admin dashboard" description="Server-rendered HTMX + Tailwind, session-cookie auth, everything live." href="/docs/configuration/dashboard" />
+<Card title="REST API" description="Bearer-token authenticated /api/v1 endpoints for services, IP rules, and bans, separate from the dashboard session cookie." href="/docs/configuration/rest-api" />
+<Card title="Prometheus metrics & request logging" description="Per-cause counters, async database logging, an optional nginx-style access.log, and a live in-dashboard terminal view." href="/docs/configuration/metrics" />
+</Cards>
+
+Continue with the [installation requirements](/docs/installation/requirements).

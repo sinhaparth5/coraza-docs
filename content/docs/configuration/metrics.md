@@ -2,12 +2,13 @@
 sidebar_position: 7
 title: Prometheus Metrics
 description: The Prometheus exposition endpoint and the counters, gauges, and runtime metrics it exposes.
+keywords: [prometheus, metrics, monitoring, exposition format]
 ---
 
 
 Coraza WAF Mod exposes a Prometheus exposition endpoint at **`/admin/metrics`**.
 
-:::warning It is behind session-cookie auth, not HTTP Basic Auth
+:::warning[It is behind session-cookie auth, not HTTP Basic Auth]
 The endpoint is protected by the **same session-cookie admin authentication** as every other dashboard
 page — it is **not** HTTP Basic Auth. A Prometheus `basic_auth:` scrape config therefore cannot
 authenticate to it: an unauthenticated scrape is redirected (302) to the login page rather than

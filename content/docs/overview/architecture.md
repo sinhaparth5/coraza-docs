@@ -2,6 +2,7 @@
 sidebar_position: 2
 title: Architecture
 description: The request pipeline, storage model, hot reload, multi-app routing, and bundled data.
+keywords: [architecture, request pipeline, reverse proxy, hot reload, storage, sqlite, mysql, postgres, go]
 ---
 
 
@@ -9,15 +10,15 @@ description: The request pipeline, storage model, hot reload, multi-app routing,
 
 Every request runs through a single `Handle` method, in strict order:
 
-1. **Bot challenge gate** — non-trusted clients without a valid bypass cookie are redirected to the
+1. **IP blocklist check** — explicit admin and autoban decisions reject immediately.
+2. **Geo blocklist check** — country blocks reject before a client is asked to solve a challenge.
+3. **Bot challenge gate** — non-trusted clients without a valid bypass cookie are redirected to the
    JS proof-of-work challenge (subject to global + per-service bot mode, OR'd with a force-challenge
    decision from [adaptive enforcement](/docs/security/threat-score) if enabled).
-2. **IP blocklist check** — exact-match block rejects.
-3. **Global rate limit** — per-IP token bucket, scaled up or down for high/low-risk IPs by the same
+4. **Global rate limit** — per-IP token bucket, scaled up or down for high/low-risk IPs by the same
    adaptive-enforcement decision when enabled.
-4. **Per-service rate limit** — optional, after routing (never scaled by adaptive enforcement — that
+5. **Per-service rate limit** — optional, after routing (never scaled by adaptive enforcement — that
    only touches the global limiter).
-5. **Geo blocklist check** — country block by resolved client IP.
 6. **Coraza WAF inspection** — full CRS + custom rules, via a per-service override engine when that
    service has its own [rule exceptions](/docs/security/waf#per-service-exceptions), else the shared
    default engine.
@@ -53,10 +54,18 @@ saving).
 
 ## State & storage
 
-Everything lives in one SQLite file via the pure-Go `modernc.org/sqlite` driver. WAL mode plus a
-bounded connection pool lets readers run concurrently with the single serialized writer. Services,
-rules, TLS state, sessions, rate-limit snapshots, and settings are all DB-backed. Uploaded TLS
-private keys are the one exception — those live on disk at mode `0600`.
+SQLite is the zero-dependency default, using the pure-Go `modernc.org/sqlite` driver with WAL mode
+and a bounded connection pool. MySQL/MariaDB and Postgres-compatible servers (including CockroachDB
+and Neon) are also supported through `--db-driver`; the schema is created and upgraded automatically
+on every backend. Services, rules, TLS state, sessions, rate-limit snapshots, request logs, and
+settings are DB-backed. Uploaded TLS private keys are the exception — those live on disk at mode
+`0600`.
+
+The optional `--db-key-file` protects stored live credentials with AES-256-GCM, including the bot
+cookie HMAC key, TOTP secrets, email token, Redis password, webhook secret, and saved external-DB
+credentials. Enabling it seals existing plaintext secrets in place; a missing or incorrect key for
+already-encrypted values fails loudly. The installer enables this by default and keeps the key at
+`/etc/coraza-waf-mod/db.key`, outside the application data directory.
 
 Request logging itself is **fire-and-forget**: every pipeline stage enqueues its outcome on a
 buffered channel drained by a dedicated worker goroutine, so logging never blocks the request hot
@@ -66,14 +75,15 @@ path. Logs are retained for a configurable number of days and pruned by a
 ## Hot reload
 
 The WAF engine, bot challenger, rate-limit backend, IP blocklist, and service registry are all
-swapped behind read/write mutexes, so dashboard changes apply with no restart.
+swapped behind read/write mutexes, so their dashboard changes apply with no restart. The database
+connection is fixed at startup and is the deliberate exception.
 
 ## Bundled data
 
-The GeoLite2-Country and DB-IP ASN Lite databases, the OWASP CRS, and the minified dashboard JS are
-all `//go:embed`-ed into the binary — there is nothing external to fetch at runtime. Everything (the
-SQLite driver, GeoIP, ASN) is pure Go, so binaries are built with `CGO_ENABLED=0` and run with no
-shared-library dependencies.
+The GeoLite2-Country and DB-IP ASN Lite databases, the OWASP CRS, compiled Tailwind CSS, and
+minified dashboard JS are all `//go:embed`-ed into the binary — there is nothing external to fetch
+at runtime. The database drivers, GeoIP, and ASN packages are pure Go, so binaries are built with
+`CGO_ENABLED=0` and run with no shared-library dependencies.
 
 ## Background subsystems
 

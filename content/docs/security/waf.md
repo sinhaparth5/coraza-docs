@@ -2,6 +2,7 @@
 sidebar_position: 1
 title: WAF Inspection
 description: Coraza v3 with the OWASP Core Rule Set compiled in, including custom rules and rule exceptions.
+keywords: [waf inspection, coraza, owasp crs, sql injection, xss, rce]
 ---
 
 

@@ -2,6 +2,7 @@
 sidebar_position: 5
 title: Troubleshooting
 description: Common problems and how to fix them — certificates, ACME, rate limiting, blocking, and systemd.
+keywords: [troubleshooting, common problems, certificate warning, rate limiting issues]
 ---
 
 
@@ -28,7 +29,14 @@ WAF host, the save is rejected. Verify the backend URL and network path.
 
 **Service won't start under systemd.** `sudo journalctl -u coraza-waf-mod -e` for the error. Common
 causes: port already in use, missing `CAP_NET_BIND_SERVICE` (binding 80/443), or a bad `--db`/`--certs`
-path the service user can't write.
+path the service user can't write. If stored secrets are encrypted, a missing or wrong
+`--db-key-file` also stops startup rather than silently clearing configuration.
 
 **Logs growing too large.** Confirm the prune timer is active (`systemctl list-timers | grep coraza`)
 or add a cron job calling `coraza-waf-mod prune`. See [Log Retention & Pruning](/docs/configuration/log-retention).
+
+**REST API returns 401 or 429.** `401` means the `Authorization: Bearer <key>` header is missing,
+malformed, or the key was revoked/never existed — create a new one from **Settings → API Keys**.
+`429` means the calling IP crossed the same 5-failures-in-15-minutes lockout the dashboard login uses;
+wait for the lockout to expire (the response includes the remaining time) rather than retrying
+immediately. See [REST API](/docs/configuration/rest-api).

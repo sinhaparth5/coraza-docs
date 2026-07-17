@@ -4,7 +4,7 @@ import { CopyableCommand } from "./copyable-command";
 
 export function InstallSection() {
   return (
-    <section className="relative isolate overflow-hidden bg-[#04120a] px-5 py-20 sm:px-8 lg:py-24">
+    <section className="relative isolate overflow-hidden bg-[color-mix(in_oklch,var(--color-pixie-green-950)_45%,black)] px-5 py-20 sm:px-8 lg:py-24">
       <div
         className="pointer-events-none absolute -left-60 bottom-[-20rem] -z-10 size-[42rem] rounded-full bg-pastel-green-700/30 blur-[140px]"
         aria-hidden="true"

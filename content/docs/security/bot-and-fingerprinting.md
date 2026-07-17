@@ -2,6 +2,7 @@
 sidebar_position: 3
 title: Bot Protection & Fingerprinting
 description: Header-based bot scoring with a JavaScript proof-of-work challenge, plus JA4 TLS fingerprinting and ASN lookup.
+keywords: [bot protection, js challenge, ja4, ja3, tls fingerprinting, proof of work]
 ---
 
 
@@ -60,7 +61,7 @@ Selenium, Puppeteer, and Playwright, stay at the challenge
 instead of earning a trusted session. Repeated unsolved challenge redirects also accrue points toward
 an [automatic IP ban](/docs/security/blocking#automatic-ip-banning).
 
-:::note This is client-side detection
+:::note[This is client-side detection]
 A determined attacker who reads the challenge page's JS can strip the signals before submitting, so
 it defeats off-the-shelf automation, not custom evasion.
 :::
@@ -77,7 +78,7 @@ independent of headers and can't be spoofed by editing the User-Agent.
 - **JA4 sorts cipher suites and extensions before hashing**, so a client that randomizes handshake
   order per connection still produces a stable fingerprint. JA4 is therefore the primary signal.
 
-:::warning Do not build new detection logic on JA3
+:::warning[Do not build new detection logic on JA3]
 JA3's MD5 hash has no such sorting and is trivially evaded by reordering the handshake. It is retained
 only for continuity with existing log data and external JA3-keyed threat feeds.
 :::

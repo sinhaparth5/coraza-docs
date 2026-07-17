@@ -2,6 +2,7 @@
 sidebar_position: 5
 title: Threat Intel & Webhooks
 description: Auto-sync external IP blocklists into the blocklist, and forward request events to a webhook asynchronously.
+keywords: [threat intel, webhooks, slack, discord, ip blocklist sync]
 ---
 
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
 import { useEffect, useState } from "react";
+import { CheckIcon, CopyIcon } from "@/components/icons";
 
 export function CopyableCommand({ command }: { command: string }) {
   const [copied, setCopied] = useState(false);
@@ -39,9 +39,13 @@ export function CopyableCommand({ command }: { command: string }) {
         }
       >
         {copied ? (
-          <Check aria-hidden="true" className="size-4 text-pastel-green-300" />
+          <CheckIcon
+            aria-hidden="true"
+            className="size-4 text-pastel-green-300"
+            size={16}
+          />
         ) : (
-          <Copy aria-hidden="true" className="size-4" />
+          <CopyIcon aria-hidden="true" className="size-4" size={16} />
         )}
         {copied ? "Copied" : "Copy"}
       </button>

@@ -2,6 +2,7 @@
 sidebar_position: 2
 title: Using the Dashboard
 description: Configure services, blocks, certificates, logs, and settings through the dashboard and its HTTP routes.
+keywords: [admin dashboard, htmx, tailwind, services, ip rules, settings]
 ---
 
 
@@ -208,8 +209,8 @@ autocert → global fallback.**
 
 **Live tail.** With **no filters set, on page 1**, new rows stream in over Server-Sent Events
 (`/admin/logs/stream`) — you watch traffic in real time. Applying any filter switches to paged
-history queried directly from SQLite (so you can page deep without the stream interfering). You can
-force history mode with `?mode=history`.
+history queried directly from the active database (so you can page deep without the stream
+interfering). You can force history mode with `?mode=history`.
 
 ![Live Logs page showing the live stream active indicator, date/app/status filters, and the request log table with time, app, IP, method, path, status, and duration columns](/img/docs/docs_logs.png)
 
@@ -231,7 +232,7 @@ rule (if any), the block reason/stage, status, and the resolved country/ASN.
 ![Log detail view showing timestamp, app/service, host, real client IP vs proxy/CDN IP, country, query string, user agent, request ID, ASN, ISP/organisation, and TLS connection details](/img/docs/docs_logs_detail.png)
 
 **Export.** The **Export** button hits `GET /admin/logs/export` with the *same* filter query params
-and downloads a CSV of the matching rows — so you can export exactly what you've filtered to.
+and streams the matching rows as newline-delimited JSON (`.ndjson`).
 
 **Retention.** Logs are pruned by the separate `prune` command / systemd timer, not from this page
 (see [Log Retention & Pruning](/docs/configuration/log-retention)).
@@ -247,8 +248,13 @@ and downloads a CSV of the matching rows — so you can export exactly what you'
 **Change admin credentials.** Enter your **current password**, then a **new email** and/or **new
 password** (typed twice). Submitting (`POST /admin/settings/credentials` with `current_password`,
 `new_email`, `new_password`, `confirm_password`) re-hashes the password with bcrypt and invalidates
-old sessions. Do this immediately if you started from the dev fallback (`admin@localhost` /
-`admin123`).
+old sessions.
+
+**Two-factor authentication.** The TOTP card enrolls any RFC 6238 authenticator by QR code or manual
+key and requires a valid code before enabling 2FA. Ten one-time backup codes are shown once and
+stored only as hashes. Disabling 2FA requires a current authenticator or backup code. If Cloudflare
+email is configured, the second login step can send a single-use recovery code (10-minute expiry,
+limited to one send per minute).
 
 **Bot protection.** Toggle the global challenger and tune it (`POST /admin/settings/bot` with
 `bot_enabled=1`, `bot_threshold`, `bot_ttl`):
@@ -269,10 +275,12 @@ Redis reachability **before** saving. Switching backends is a hot reload. See
 **ACME email.** Set the Let's Encrypt contact email (`POST /admin/settings/acme-email` with
 `email`). This must be set before per-service auto-issue or global ACME will work.
 
-**Webhooks.** Configure event delivery (`POST /admin/settings/webhook` with `webhook_url`,
-`webhook_secret`, `webhook_enabled=1`, and one or more `webhook_events` checkboxes). If no events
-are selected it defaults to `blocked`. Delivery is asynchronous and includes the configured secret
-in the `X-WAF-Secret` header; a slow endpoint never blocks logging. See
+**Webhooks.** Configure generic JSON, Slack Block Kit, or Discord embed delivery
+(`POST /admin/settings/webhook` with `webhook_destination_type`, `webhook_url`, `webhook_secret`,
+`webhook_enabled=1`, and one or more `webhook_events` checkboxes). If no events are selected it
+defaults to `blocked`. The generic secret is sent verbatim in `X-WAF-Secret`; it is not an HMAC.
+Slack and Discord use incoming webhook URLs and ignore that header. **Send test alert** posts a
+synthetic block using the saved settings, even when delivery is disabled. See
 [Threat Intel & Webhooks](/docs/security/threat-intel-webhooks).
 
 **Threat-intel sources.** On **Threat Intel** (`/admin/threat-intel`): add a source with a **label**,
@@ -294,8 +302,29 @@ pre-filled once saved, so leave it blank on subsequent saves to keep the existin
 report** (`POST /admin/settings/email/test`) sends an on-demand report from the currently saved config,
 so you can verify credentials before enabling the schedule.
 
-**Database backup.** `GET /admin/settings/backup` downloads a copy of the entire `waf.db`. The file
-contains the bcrypt admin hash and challenge secret, so store it securely.
+**Database backup.** For SQLite deployments, `POST /admin/settings/backup` downloads a consistent,
+vacuumed copy of `waf.db` while the server remains live. External backends need their native backup
+tools. Treat a download as sensitive. With `--db-key-file`, live credentials inside it remain
+encrypted, and the key is deliberately not included.
+
+**Database connection.** The card can build a MySQL/MariaDB or Postgres-compatible connection from
+separate fields, or accept a raw DSN. **Test connection** performs a five-second dial and ping without
+changing the live server. **Migrate configuration here** copies services, rules and settings,
+secrets, certificates, API keys, threat-intel data, webhooks, threat scores, and JA4 reputation into
+an empty target; request logs, sessions, and transient rate-limit state are excluded. The source is
+never modified, but a partially written target may need to be emptied before retrying a failed
+migration. Test results show the `--db-driver` and `--db` flags to use on restart; saving or migrating
+does not switch the current process. The migration connection has no key-file input, so secret values
+land in the target as plaintext; keep `--db-key-file` on the restarted service so its first startup
+seals them in place immediately. Certificate records migrate, while their referenced cert/key files
+remain under `--certs` on disk.
+
+**API Keys.** The **API Keys** card creates and revokes bearer tokens for the [REST
+API](/docs/configuration/rest-api). Enter a **name** (e.g. `ci-deploy`) and click **Create key**
+(`POST /admin/settings/api-keys` with `name`) — the **full key is shown exactly once**; copy it
+immediately, since only its hash and a short display prefix are stored afterward. **Revoke** a key
+with its row's delete control (`DELETE /admin/settings/api-keys/:id`) — any request already using
+that token is rejected on its very next call.
 
 **Reload custom WAF rules.** If you use `--waf-rules` to layer custom `.conf` files on top of the
 OWASP CRS, editing those files on disk is **not** picked up automatically. Send `SIGHUP` to the

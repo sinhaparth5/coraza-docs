@@ -2,6 +2,7 @@
 sidebar_position: 7
 title: Security Response Headers
 description: Browser-hardening headers applied to every response, plus the forced Server header.
+keywords: [security headers, hsts, x-frame-options, response headers]
 ---
 
 

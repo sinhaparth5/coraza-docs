@@ -1,9 +1,11 @@
+import { remarkDirectiveAdmonition } from "fumadocs-core/mdx-plugins";
 import { metaSchema, pageSchema } from "fumadocs-core/source/schema";
 import {
   defineCollections,
   defineConfig,
   defineDocs,
 } from "fumadocs-mdx/config";
+import remarkDirective from "remark-directive";
 import { z } from "zod";
 
 // You can customize Zod schemas for frontmatter and `meta.json` here
@@ -11,7 +13,9 @@ import { z } from "zod";
 export const docs = defineDocs({
   dir: "content/docs",
   docs: {
-    schema: pageSchema,
+    schema: pageSchema.extend({
+      keywords: z.array(z.string()).default([]),
+    }),
     postprocess: {
       includeProcessedMarkdown: true,
     },
@@ -36,6 +40,6 @@ export const blog = defineCollections({
 
 export default defineConfig({
   mdxOptions: {
-    // MDX options
+    remarkPlugins: (v) => [...v, remarkDirective, remarkDirectiveAdmonition],
   },
 });

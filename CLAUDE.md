@@ -22,7 +22,9 @@ There is no test framework configured. Verify changes with `pnpm lint`, `pnpm ty
 
 ## Architecture
 
-**Content vs. app split**: Documentation and blog posts are authored as MD/MDX under `content/docs/` and `content/blog/`, not as React routes. `source.config.ts` defines the Fumadocs collections (`docs`, `blog`) including frontmatter schemas (blog posts require `slug`, `date`, `authors`, `tags`; docs use Fumadocs' standard `pageSchema`). Fumadocs MDX compiles these into `.source/` (generated, gitignored, never edit directly) and the `collections/*` path alias (mapped to `.source/*` in `tsconfig.json`).
+**Content vs. app split**: Documentation and blog posts are authored as MD/MDX under `content/docs/` and `content/blog/`, not as React routes. `source.config.ts` defines the Fumadocs collections (`docs`, `blog`) including frontmatter schemas (blog posts require `slug` and `date`, with optional `authors`, `tags`, `image`, `keywords`; docs use Fumadocs' `pageSchema` extended with `keywords`). MDX content supports directive admonitions (`:::note` etc.) via `remark-directive`. Fumadocs MDX compiles these into `.source/` (generated, gitignored, never edit directly) and the `collections/*` path alias (mapped to `.source/*` in `tsconfig.json`).
+
+**Blog metadata (`src/lib/blog.ts`)**: author and tag ids used in frontmatter must exist in `content/blog/authors.json` / `content/blog/tags.json`. Blog card/OG images are statically imported and registered in the `blogImages` map in `blog.ts` — a new post needs its image added there or it falls back to the generic SEO image.
 
 **Source loading (`src/lib/source.ts`)**: `source` and `blogSource` are `fumadocs-core` loaders built from those collections — nearly everything content-related (page lookup, static params, search indexing, LLM text export) goes through these two loader instances rather than reading the filesystem directly. `src/lib/shared.ts` centralizes route constants (`docsRoute`, `docsContentRoute`, etc.) and `gitConfig` (GitHub org/repo/branch used to build "edit on GitHub" links) — update `gitConfig` there, not inline.
 
@@ -36,7 +38,9 @@ There is no test framework configured. Verify changes with `pnpm lint`, `pnpm ty
 
 **Content negotiation (`proxy.ts`)**: rewrites requests for `.md` suffixed doc URLs, or requests from clients that prefer Markdown (`isMarkdownPreferred`), to the `content.md` route under `docsContentRoute` instead of the HTML page. This is how `/docs/foo.md` and markdown-preferring user agents get raw content instead of rendered HTML.
 
-**Icons (`src/components/icons/`)**: custom SVG icon components, not a third-party icon library, each exporting a component and a `*IconHandle` type for imperative control (many support `startAnimation()`/`stopAnimation()` and must respect reduced-motion). New icons: `0 0 24 24` viewBox, `currentColor`, export from `index.ts`, and check them off in `ICON_REPLACEMENTS.md`, which tracks which framework-default (Fumadocs) icons and app icons still need custom replacements — consult it before assuming an icon is unstyled or missing.
+**Icons (`src/components/icons/`)**: custom SVG icon components, not a third-party icon library, each exporting a component and a `*IconHandle` type for imperative control (many support `startAnimation()`/`stopAnimation()` and must respect reduced-motion). New icons: `0 0 24 24` viewBox, `currentColor`, export from `index.ts`, and check them off in `src/components/icons/ICON_REPLACEMENTS.md`, which tracks which framework-default (Fumadocs) icons and app icons still need custom replacements — consult it before assuming an icon is unstyled or missing.
+
+**Other root files**: `Dockerfile` builds the production image (pnpm install with `--ignore-scripts`, then explicit `pnpm postinstall` + `pnpm build`; native builds for `esbuild`/`sharp` are allowlisted in `pnpm-workspace.yaml`). `docs.md` at the repo root is a legacy consolidated export from the old Docusaurus site — reference material only, not served by this app.
 
 ## Coding style
 

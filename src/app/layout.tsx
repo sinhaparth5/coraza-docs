@@ -2,6 +2,8 @@ import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import localFont from "next/font/local";
+import Script from "next/script";
+import { CookieConsentBanner } from "@/components/cookie-consent";
 import { appName } from "@/lib/shared";
 import seoImage from "@/static/img/seo_image.jpg";
 import "./global.css";
@@ -80,8 +82,14 @@ export default function Layout({ children }: LayoutProps<"/">) {
       className={`${dmSans.variable} ${clashGrotesk.variable} ${dmSans.className}`}
       suppressHydrationWarning
     >
+      <Script
+        src="https://analytics.ahrefs.com/analytics.js"
+        data-key="PKvhYC++VHQ209t/ICjrig"
+        strategy="afterInteractive"
+      />
       <body className="flex flex-col min-h-screen">
         <RootProvider>{children}</RootProvider>
+        <CookieConsentBanner />
       </body>
     </html>
   );

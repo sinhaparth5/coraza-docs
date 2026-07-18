@@ -48,6 +48,7 @@ export const footerLinks: {
       { label: "Blog", href: "/blog" },
       { label: "FAQ", href: "/docs/faq" },
       { label: "Troubleshooting", href: "/docs/troubleshooting" },
+      { label: "Privacy & cookies", href: "/privacy" },
       { label: "GitHub", href: GITHUB_URL, external: true },
     ],
   },

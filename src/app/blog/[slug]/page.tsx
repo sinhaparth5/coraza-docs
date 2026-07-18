@@ -64,7 +64,7 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
         // biome-ignore lint/security/noDangerouslySetInnerHtml: static, non-user-controlled JSON-LD
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto w-full min-w-0 max-w-3xl">
         <Link
           href="/blog"
           className="mb-10 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-fd-muted-foreground no-underline transition-colors duration-200 hover:text-pastel-green-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pastel-green-500 dark:hover:text-pastel-green-300"

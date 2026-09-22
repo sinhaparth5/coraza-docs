@@ -21,7 +21,7 @@ const features: FeatureItem[] = [
   {
     title: "WAF inspection",
     description:
-      "Coraza v3 and the OWASP Core Rule Set inspect requests for SQLi, XSS, RCE, path traversal, and known scanner agents — the same pipeline stage every request runs through before it reaches your backend.",
+      "Coraza v3 and the OWASP Core Rule Set inspect requests for SQLi, XSS, RCE, path traversal, and known scanner agents. It's the pipeline stage every request runs through before reaching your backend.",
     icon: <ShieldCheckIcon aria-hidden="true" className="size-7" size={28} />,
     span: "lg:col-span-2 lg:row-span-2",
     flagship: true,

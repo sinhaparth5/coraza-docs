@@ -62,7 +62,7 @@ exception. You can later switch to a trusted certificate from **Settings → TLS
 
 ## Option B — Build from source
 
-Requires Go 1.25+.
+Requires Go 1.25.6+ (the version pinned in `go.mod`).
 
 ```bash
 git clone https://github.com/sinhaparth5/coraza-waf-mod.git

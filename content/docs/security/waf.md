@@ -36,7 +36,7 @@ SecRuleEngine On
 SecRequestBodyAccess On
 SecResponseBodyAccess Off
 SecRequestBodyLimit <configured limit, bytes>
-SecRequestBodyNoFilesLimit 131072
+SecRequestBodyLimitAction Reject
 SecDebugLogLevel 0
 SecRuleRemoveById <space-separated rule IDs>   # only present if the disabled-rule list is non-empty
 ```
@@ -51,6 +51,53 @@ CRS's transformation and collection setup, with blocking enabled before the file
 
 `SecResponseBodyAccess Off` disables response-body buffering and inspection. Only requests are
 inspected, avoiding extra WAF latency for large or streamed backend responses.
+
+## Request body size limits
+
+Bodies are inspected up to a size limit that depends on their declared `Content-Type`, since the
+cost of running CRS's ~200 rules over a body scales with how much of it ends up in `ARGS`:
+
+| Body shape | Limit | Why |
+|---|---|---|
+| `multipart/form-data` | **~12.5 MiB** (`SecRequestBodyLimit`) | Coraza routes file parts to `FILES`, not `ARGS`, so CRS never scans the file bytes. A multipart upload at this size costs only tens of milliseconds. |
+| Everything else that's inspected (JSON, plain text, etc.) | **128 KiB** | A body with no file parts is parsed into `ARGS` in full, and every byte of it is run through CRS's rule set. |
+| Content types Coraza doesn't recognize as a form (images, binaries, video, arbitrary uploads) | **not inspected — streamed straight through** | Coraza only infers a body processor for `x-www-form-urlencoded` and `multipart/form-data`. Without this gate, CRS rule 901340 would force every other content type to be parsed as `URLENCODED` too, turning a binary payload into one junk `ARGS` entry per 256 bytes. |
+
+The 128 KiB figure is enforced in application code, not by a Coraza directive — Coraza parses
+`SecRequestBodyNoFilesLimit` but does not act on it
+([corazawaf/coraza#896](https://github.com/corazawaf/coraza/issues/896)), which is also why that
+directive doesn't appear in the block above.
+
+A request over these limits is rejected (`SecRequestBodyLimitAction Reject`), not silently truncated
+and inspected anyway.
+
+:::note[Large binary uploads, e.g. to an S3-compatible backend]
+Some backends, S3-compatible object storage in particular, accept large `application/javascript` /
+`text/javascript` payloads that would otherwise hit the 128 KiB limit and CRS rule 911100 (method) /
+920420 (content type). The **Uploads** toggle on a service's Manage panel (`AllowLargeJSUploads`)
+exempts that one service: JavaScript-typed bodies stream to the backend unread, and `PUT`/content-type
+enforcement is relaxed for it specifically. Every other header-phase rule, plus the IP/geo/bot/rate-limit
+stages, still runs. Only the body-inspection gate widens, not the rest of the pipeline.
+:::
+
+## JSON request-body schema validation
+
+A per-service **JSON Schema** can be attached to validate JSON request bodies beyond what CRS's
+generic rules check. This is useful for a REST API where you already know the exact shape a valid
+request body takes.
+
+Set it from a service's Manage panel, or `POST {admin path}/services/schema/:id` with `schema` (the
+JSON Schema text) and `mode`:
+
+| Mode | Effect |
+|---|---|
+| `off` | Validation disabled (default). An empty schema also disables it. |
+| `log` | A mismatching body is recorded in the request log but **not blocked** — use this to check a schema against real traffic before enforcing it. |
+| `enforce` | A mismatching body is rejected with `400`. |
+
+A malformed schema is rejected at save time, before it reaches the database, so a bad schema can't
+later break a WAF reload. The schema is compiled once per engine build (on save, and on every
+[per-service exception](#per-service-exceptions) rebuild or `SIGHUP`), never per request.
 
 ## Disabling a noisy rule
 

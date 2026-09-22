@@ -26,7 +26,14 @@ cross-site request forgery, not to gate a header-based token.
    and replaced with a new one.
 3. Send it on every request: `Authorization: Bearer cwaf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`.
 
-Keys are **all-or-nothing** in v1 — full read-write, no read-only scope.
+## Read-only keys
+
+Check **Read-only** when creating a key to scope it to `GET` requests. A read-only key reaches every
+endpoint below for reading, but any `POST`/`PUT`/`DELETE` on that key returns `403` with
+`{"error": "this API key is read-only"}` — the request never touches the underlying service, so it's
+safe to hand to a monitoring dashboard or a status page that has no business changing configuration.
+The **Read-only** badge on a key's row in **Settings → API Keys** shows which keys are scoped this way.
+A key created without the checkbox is full read-write, as before.
 
 ## Brute-force protection
 

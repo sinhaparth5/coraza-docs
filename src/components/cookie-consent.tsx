@@ -45,34 +45,32 @@ export function CookieConsentBanner() {
     <div
       role="dialog"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-50 p-4 sm:p-6"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-fd-border bg-fd-popover/95 px-4 py-3 text-fd-popover-foreground shadow-xl backdrop-blur"
     >
-      <div className="mx-auto max-w-2xl rounded-xl border border-fd-border bg-fd-popover p-5 text-fd-popover-foreground shadow-xl">
-        <p className="text-sm font-bold">Cookies on this site</p>
-        <p className="mt-2 text-sm leading-6 text-fd-muted-foreground">
+      <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs leading-5 text-fd-muted-foreground">
           We use an essential cookie to remember this choice, and — only if you
-          agree — Google Analytics cookies to understand how the docs are used.
-          See our{" "}
+          agree — Google Analytics cookies to understand how the docs are used.{" "}
           <Link
             href="/privacy"
             className="font-medium text-pixie-green-600 underline underline-offset-2 hover:text-pixie-green-700"
           >
-            privacy &amp; cookie policy
-          </Link>{" "}
-          for details.
+            Details
+          </Link>
+          .
         </p>
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <div className="flex shrink-0 gap-2">
           <button
             type="button"
             onClick={() => setConsent("all")}
-            className={`${buttonBase} bg-pixie-green-600 text-white hover:bg-pixie-green-700`}
+            className={`${buttonBase} min-h-9 flex-1 bg-pixie-green-600 px-3 text-xs text-white hover:bg-pixie-green-700 sm:flex-none`}
           >
             Accept all
           </button>
           <button
             type="button"
             onClick={() => setConsent("essential")}
-            className={`${buttonBase} border border-fd-border bg-transparent hover:bg-fd-muted`}
+            className={`${buttonBase} min-h-9 flex-1 border border-fd-border bg-transparent px-3 text-xs hover:bg-fd-muted sm:flex-none`}
           >
             Essential only
           </button>

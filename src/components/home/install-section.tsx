@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { GITHUB_URL } from "./constants";
+import { databaseDrivers, GITHUB_URL } from "./constants";
 import { CopyableCommand } from "./copyable-command";
 
 export function InstallSection() {
@@ -42,6 +42,17 @@ export function InstallSection() {
           </code>
           . Requires Go 1.25+, no CGO.
         </p>
+        <div className="mb-10 flex flex-wrap items-center justify-center gap-2">
+          <span className="text-sm text-white/50">Ships with SQLite, or:</span>
+          {databaseDrivers.slice(1).map((driver) => (
+            <span
+              key={driver}
+              className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/75"
+            >
+              {driver}
+            </span>
+          ))}
+        </div>
         <div className="flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href="/docs"

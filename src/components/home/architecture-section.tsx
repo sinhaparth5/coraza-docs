@@ -1,23 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ActivityIcon,
-  ArrowRightIcon,
-  EarthIcon,
-  LockKeyholeIcon,
-  RouteIcon,
-  ShieldCheckIcon,
-} from "@/components/icons";
+import { ArrowRightIcon } from "@/components/icons";
 import archDiagram from "@/static/img/arch_diagram_white-bg.png";
-import { pipeline } from "./constants";
-
-const stageIcons = [
-  LockKeyholeIcon,
-  ActivityIcon,
-  EarthIcon,
-  ShieldCheckIcon,
-  RouteIcon,
-];
+import { PipelineFlow } from "./pipeline-flow";
 
 export function ArchitectureSection() {
   return (
@@ -45,37 +30,13 @@ export function ArchitectureSection() {
           </h2>
           <p className="mt-4 text-pretty text-base leading-7 text-pastel-green-900/70 sm:text-lg dark:text-pastel-green-100/70">
             Bot detection, rate limiting, geo policy, WAF inspection, and
-            routing execute as one strict sequence inside a single Go binary —
-            no sidecars, no service mesh, no extra network hop between checks.
+            routing execute as one strict sequence inside a single Go binary,
+            with no sidecars, no service mesh, and no extra network hop between
+            checks.
           </p>
         </div>
 
-        <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {pipeline.map((item, index) => {
-            const StageIcon = stageIcons[index];
-            return (
-              <li
-                key={item.stage}
-                className="group rounded-2xl border border-pastel-green-900/10 bg-white/70 p-5 backdrop-blur-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_35px_rgba(16,34,18,0.1)] dark:border-pastel-green-200/10 dark:bg-black/20"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold tabular-nums text-pixie-green-600 dark:text-pixie-green-300">
-                    {item.stage}
-                  </span>
-                  <span className="flex size-9 items-center justify-center rounded-full bg-pixie-green-100 text-pixie-green-700 dark:bg-pixie-green-900/40 dark:text-pixie-green-200">
-                    <StageIcon aria-hidden="true" size={18} />
-                  </span>
-                </div>
-                <h3 className="mt-4 text-sm font-bold text-pastel-green-950 dark:text-pastel-green-50">
-                  {item.title}
-                </h3>
-                <p className="mt-1.5 text-xs leading-5 text-pastel-green-900/65 dark:text-pastel-green-100/65">
-                  {item.detail}
-                </p>
-              </li>
-            );
-          })}
-        </ol>
+        <PipelineFlow />
 
         <div className="mt-12">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">

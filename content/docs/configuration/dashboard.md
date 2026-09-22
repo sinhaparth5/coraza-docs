@@ -161,6 +161,15 @@ ID with a reason and a **Scope** — `Global (all services)` or one specific ser
 (`DELETE /admin/waf-rules/:id` for a global exception, `DELETE /admin/waf-rules/service/:id` for a
 per-service one). The WAF engine rebuilds itself from the current disabled-rule list(s), so the
 change is live. See [WAF Inspection](/docs/security/waf#per-service-exceptions).
+
+**Suggested Exceptions.** The same page has a **Suggested Exceptions** card built from the
+false/true-positive marks you leave on blocked requests in the [Logs page](#request-logs) (see
+"Was this rule correct?" below). A (rule, service) pair is suggested once it's been marked
+false-positive at least **5 times** with **zero** true-positive marks in the last **7 days**
+(both configurable at the bottom of the card, `POST /admin/waf-rules/feedback-config` with
+`feedback_threshold`, `feedback_window`). This is signal collection only — nothing is disabled
+automatically. Each suggestion's **Add exception** button pre-fills the same disable form above with
+a reason like `Suggested: 6 false-positive marks in the last 7 days`, so you still make the call.
 :::
 
 ## Certificates & per-service TLS
@@ -227,7 +236,11 @@ interfering). You can force history mode with `?mode=history`.
 (`from`/`to` use the HTML `datetime-local` format `YYYY-MM-DDTHH:MM`.)
 
 **Detail view.** Click a row to open `GET /admin/logs/:id` — full request headers, the matched WAF
-rule (if any), the block reason/stage, status, and the resolved country/ASN.
+rule (if any), the block reason/stage, status, and the resolved country/ASN. When a WAF rule matched,
+a **"Was this rule correct?"** row lets you mark it **False positive** or **Correct block**
+(`POST /admin/logs/feedback/:id` with `false_positive`) — this feeds the WAF Rules page's
+**Suggested Exceptions** card described above under **Blocks**; marking doesn't change the request's
+own outcome, it only records signal for future suggestions.
 
 ![Log detail view showing timestamp, app/service, host, real client IP vs proxy/CDN IP, country, query string, user agent, request ID, ASN, ISP/organisation, and TLS connection details](/img/docs/docs_logs_detail.png)
 
@@ -255,6 +268,27 @@ key and requires a valid code before enabling 2FA. Ten one-time backup codes are
 stored only as hashes. Disabling 2FA requires a current authenticator or backup code. If Cloudflare
 email is configured, the second login step can send a single-use recovery code (10-minute expiry,
 limited to one send per minute).
+
+**Passkeys.** The **Passkeys** card registers a WebAuthn credential — a fingerprint, face, PIN, or
+security key tied to this exact origin — as a second factor accepted **alongside**, not instead of,
+TOTP: enrolling a passkey with no TOTP enrolled still routes login through the second-factor step,
+where either a TOTP/backup code or a passkey satisfies it. Name the passkey, click **Add a passkey**,
+and complete your browser/OS prompt (`POST /admin/settings/passkeys/begin` then `/finish`, standard
+WebAuthn attestation). Register one per device — a laptop and a phone, say. Registration needs a
+secure context (HTTPS with a real hostname, or `localhost`); the card shows a warning instead of the
+form when the admin panel is reached over plain HTTP or a bare IP. **Remove** a passkey with its row's
+delete control (`DELETE /admin/settings/passkeys/:id`).
+
+**Registered devices.** Coraza WAF Mod keeps **one live admin session at a time**: signing in on a new
+device immediately signs the previous one out. The **Registered devices** card lists every session,
+live or historical, with its browser/OS, resolved country, IP, and last-active time. A live session's
+row control **signs it out**; an already signed-out row's control **deletes it from history** instead,
+since there's nothing left to revoke. History is kept for **30 days**, so you can review where the
+account has been used even after a device signs itself out normally. **Log out all other devices**
+(`POST /admin/settings/devices/revoke-others`) revokes everything but the current session in one
+action, for a shared or lost device. Signing out — yours or another device's — deletes that row
+outright rather than marking it revoked, so a session you intentionally end doesn't linger in the
+history list.
 
 **Bot protection.** Toggle the global challenger and tune it (`POST /admin/settings/bot` with
 `bot_enabled=1`, `bot_threshold`, `bot_ttl`):
@@ -320,11 +354,22 @@ seals them in place immediately. Certificate records migrate, while their refere
 remain under `--certs` on disk.
 
 **API Keys.** The **API Keys** card creates and revokes bearer tokens for the [REST
-API](/docs/configuration/rest-api). Enter a **name** (e.g. `ci-deploy`) and click **Create key**
-(`POST /admin/settings/api-keys` with `name`) — the **full key is shown exactly once**; copy it
-immediately, since only its hash and a short display prefix are stored afterward. **Revoke** a key
-with its row's delete control (`DELETE /admin/settings/api-keys/:id`) — any request already using
-that token is rejected on its very next call.
+API](/docs/configuration/rest-api). Enter a **name** (e.g. `ci-deploy`), optionally check
+**Read-only** to scope the key to `GET` requests only (every write returns `403`), and click
+**Create key** (`POST /admin/settings/api-keys` with `name`, `read_only`) — the **full key is shown
+exactly once**; copy it immediately, since only its hash and a short display prefix are stored
+afterward. A key's row shows a **Read-only** badge when scoped that way. **Revoke** a key with its
+row's delete control (`DELETE /admin/settings/api-keys/:id`) — any request already using that token
+is rejected on its very next call.
+
+**AI Classification.** The per-IP [threat score](/docs/security/threat-score)'s ASN/hosting component
+is a hardcoded keyword heuristic by default. The **AI Classification** card lets you refine it with
+[TypeSafe](https://typesafe.ai): once enabled with an API key, an ASN organization name the heuristic
+doesn't recognize is judged once, off the request path and off the logging worker, and the result is
+cached — so this never adds latency to a request. Toggle **Enable AI-assisted ASN classification** and
+paste a **TypeSafe API key** (`POST /admin/settings/typesafe` with `typesafe_enabled`,
+`typesafe_api_key`); the key field is never shown again once saved, so leave it blank on later saves
+to keep the stored value. Off by default — the keyword heuristic keeps working without this.
 
 **Reload custom WAF rules.** If you use `--waf-rules` to layer custom `.conf` files on top of the
 OWASP CRS, editing those files on disk is **not** picked up automatically. Send `SIGHUP` to the

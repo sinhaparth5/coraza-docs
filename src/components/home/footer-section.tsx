@@ -67,6 +67,16 @@ export function FooterSection() {
           </Link>
         </div>
       </div>
+
+      <div className="relative z-10 w-full overflow-hidden border-t border-white/10 px-4 py-10 sm:px-6 sm:py-14">
+        <p
+          aria-hidden="true"
+          className="select-none whitespace-nowrap text-center font-extrabold uppercase leading-none tracking-tighter text-white/15"
+          style={{ fontSize: "clamp(2.5rem, 10vw, 15rem)" }}
+        >
+          {appName}
+        </p>
+      </div>
     </footer>
   );
 }

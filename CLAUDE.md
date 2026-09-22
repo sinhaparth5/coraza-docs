@@ -51,6 +51,10 @@ There is no test framework configured. Verify changes with `pnpm lint`, `pnpm ty
 - Content filenames and URL slugs: lowercase, hyphenated, with `title`/`description` frontmatter.
 - Don't edit or commit `.next/` or `.source/` (generated).
 
+## Deployment
+
+`.github/workflows/deploy-production.yml` builds the `Dockerfile` image on push to `master`, pushes it to GHCR, then SSHes into the VPS to pull and restart the `coraza-waf-docs` container (proxied to `127.0.0.1:18085`). No staging environment or preview deploys — `master` is production.
+
 ## Commits & PRs
 
 Commit summaries are short, imperative, lowercase (e.g. `updated the node version`). PRs should explain what changed and why, list verification commands run, link relevant issues, and include before/after screenshots for visible UI or doc-layout changes.

@@ -18,7 +18,8 @@ export function DashboardSection() {
         </h2>
         <p className="mx-auto mb-10 mt-4 max-w-xl text-pretty text-base leading-7 text-white/65 sm:text-lg">
           Filter request decisions by status, app, or date. The live view
-          streams new traffic as it arrives — no separate log aggregator to run.
+          streams new traffic as it arrives, with no separate log aggregator to
+          run.
         </p>
         <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 shadow-[0_35px_90px_-25px_rgba(0,0,0,0.75)] ring-1 ring-pixie-green-300/15">
           <Image

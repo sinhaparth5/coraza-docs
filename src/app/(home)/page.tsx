@@ -2,32 +2,62 @@ import type { Metadata } from "next";
 import {
   ArchitectureSection,
   DashboardSection,
+  DocsSearchSection,
+  FaqSection,
   FeaturesSection,
   FooterSection,
   HeroSection,
   InstallSection,
+  SecurityDepthSection,
+  SelfContainedSection,
+  StackComparisonSection,
   StatsSection,
 } from "@/components/home";
+import { faqItems } from "@/components/home/constants";
+import seoImage from "@/static/img/seo_image.jpg";
+
+const title = "Coraza WAF Mod: WAF and reverse proxy in a single Go binary";
+const description =
+  "A single Go binary combining OWASP CRS inspection, reverse proxy routing, TLS, rate limiting, and an admin dashboard. No Docker or database server needed.";
 
 export const metadata: Metadata = {
-  title: {
-    absolute: "Coraza WAF Mod: WAF and reverse proxy in a single Go binary",
-  },
-  description:
-    "Coraza WAF Mod combines OWASP CRS inspection, reverse proxy routing, TLS, and an admin dashboard without Docker or an external database.",
+  title: { absolute: title },
+  description,
   keywords: [
     "coraza waf mod",
     "web application firewall",
     "reverse proxy",
     "owasp crs",
+    "coraza v3",
     "go waf",
     "single binary waf",
     "admin dashboard",
     "ip and geo blocking",
     "bot protection",
+    "rate limiting",
+    "tls termination",
+    "sqlite",
     "mysql",
     "postgres",
   ],
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    siteName: "Coraza WAF Mod",
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title,
+    description,
+    images: [seoImage.src],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: [seoImage.src],
+  },
 };
 
 const jsonLd = {
@@ -60,6 +90,17 @@ const jsonLd = {
       logo: "https://waf.astrareconslabs.com/img/logo.svg",
       sameAs: ["https://github.com/sinhaparth5/coraza-waf-mod"],
     },
+    {
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    },
   ],
 };
 
@@ -74,9 +115,14 @@ export default function HomePage() {
       <HeroSection />
       <StatsSection />
       <FeaturesSection />
+      <StackComparisonSection />
+      <SecurityDepthSection />
       <DashboardSection />
       <ArchitectureSection />
+      <SelfContainedSection />
       <InstallSection />
+      <FaqSection />
+      <DocsSearchSection />
       <FooterSection />
     </>
   );

@@ -54,6 +54,110 @@ export const footerLinks: {
   },
 ];
 
+export const securityChecklist: { title: string; detail: string }[] = [
+  {
+    title: "Threat score & adaptive enforcement",
+    detail:
+      "A composite 0–100 per-IP risk score blends autoban, bot, ASN, geo, and JA4 signals, and can scale rate limits or force a challenge for high-risk clients.",
+  },
+  {
+    title: "Automatic IP banning",
+    detail:
+      "A sliding-window score bans repeat offenders on its own, instead of needing a manual rule for every abusive IP.",
+  },
+  {
+    title: "Bot & JA4 fingerprinting",
+    detail:
+      "A JS proof-of-work challenge plus TLS JA4 fingerprint history tells scripted clients apart from real browsers.",
+  },
+  {
+    title: "Suggested exceptions",
+    detail:
+      "Feedback on blocked and allowed requests trains rule-exception suggestions, instead of tuning the WAF blind.",
+  },
+  {
+    title: "Passkeys & single-session login",
+    detail:
+      "WebAuthn passkeys and one live admin session at a time. Signing in on a new device signs the previous one out.",
+  },
+  {
+    title: "Scoped API keys",
+    detail:
+      "Issue read-only keys for integrations that only pull data, kept separate from full-access keys.",
+  },
+  {
+    title: "JSON schema validation",
+    detail:
+      "Enforce a JSON Schema per service in log-only or blocking mode before a request body reaches your backend.",
+  },
+  {
+    title: "Request body limits",
+    detail:
+      "Content-Type-aware size caps, with a per-service toggle for larger JS and asset uploads.",
+  },
+  {
+    title: "Threat intel webhooks & trusted proxies",
+    detail:
+      "Push block and challenge events to your own webhook, and trust the right proxy chain for real client IPs behind Cloudflare or Varnish.",
+  },
+  {
+    title: "Log retention & export",
+    detail:
+      "Prune or export request logs on a schedule instead of letting the database grow forever.",
+  },
+];
+
+export const databaseDrivers = [
+  "SQLite",
+  "MySQL",
+  "MariaDB",
+  "Postgres",
+  "CockroachDB",
+  "Neon",
+];
+
+export const noDepsChips = [
+  "No Docker",
+  "No config.yaml",
+  "No external database server",
+  "No MaxMind account",
+  "No Redis, unless you scale to multiple nodes",
+  "Nothing fetched at runtime: GeoIP, CRS, and the dashboard are embedded",
+];
+
+export const faqItems: { question: string; answer: string }[] = [
+  {
+    question: "Do I need Docker?",
+    answer:
+      "No. Native binary + systemd installation remains supported. A published multi-architecture image is also available from GHCR for container deployments.",
+  },
+  {
+    question: "Do I need a database server?",
+    answer:
+      "No. SQLite is the default. MySQL/MariaDB and Postgres-compatible servers are optional alternatives; Redis is separate and only provides shared rate-limit state.",
+  },
+  {
+    question: "Do I need a MaxMind account for geo blocking?",
+    answer:
+      "No. A GeoLite2-Country database is bundled. You can optionally override it with a freshly downloaded .mmdb via --geo-db.",
+  },
+  {
+    question: "Is there a config file?",
+    answer:
+      "Not for the running server. It's configured by CLI flags plus the dashboard/database. Older docs referencing config.yaml predate the move to flags.",
+  },
+  {
+    question: "Can I run multiple instances?",
+    answer:
+      "Yes, behind a load balancer. Use an external database for shared state, Redis for a shared rate-limit view, and set --trusted-proxies to the load balancer's CIDR.",
+  },
+  {
+    question: "Can I manage services and IP rules without the dashboard UI?",
+    answer:
+      "Yes. A bearer-token-authenticated REST API at /admin/api/v1 covers services, IP rules, and bans, for scripting and CI integrations.",
+  },
+];
+
 export const pipeline = [
   {
     stage: "01",

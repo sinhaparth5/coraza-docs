@@ -9,13 +9,15 @@ keywords: [security headers, hsts, x-frame-options, response headers]
 A global middleware sets browser-hardening headers on **every** response (blocked, admin, and
 proxied alike):
 
-- `X-Frame-Options`
-- `X-Content-Type-Options`
-- `Referrer-Policy`
-- `Permissions-Policy`
-- `Cross-Origin-Opener-Policy`
-- **HSTS** on TLS connections
-- `X-WAF-Engine` identification header
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: SAMEORIGIN`
+- `X-XSS-Protection: 1; mode=block`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()`
+- `Cross-Origin-Opener-Policy: same-origin`
+- `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`, only on TLS connections
+  (`c.Request().TLS != nil`) so a plain-HTTP dev setup is never told to force HTTPS
+- `X-WAF-Engine: Coraza v3 / OWASP CRS`
 
 The `Server` header on every response is forced to `Coraza WAF Mod`, overwriting whatever the
 backend sent.

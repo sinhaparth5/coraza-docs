@@ -1,7 +1,12 @@
 export { ArchitectureSection } from "./architecture-section";
 export { DashboardSection } from "./dashboard-section";
+export { DocsSearchSection } from "./docs-search-section";
+export { FaqSection } from "./faq-section";
 export { FeaturesSection } from "./features-section";
 export { FooterSection } from "./footer-section";
 export { HeroSection } from "./hero-section";
 export { InstallSection } from "./install-section";
+export { SecurityDepthSection } from "./security-depth-section";
+export { SelfContainedSection } from "./self-contained-section";
+export { StackComparisonSection } from "./stack-comparison-section";
 export { StatsSection } from "./stats-section";

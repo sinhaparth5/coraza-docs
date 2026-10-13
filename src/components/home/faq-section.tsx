@@ -6,7 +6,7 @@ export function FaqSection() {
   return (
     <section className="border-b border-rule px-5 py-20 sm:px-8 lg:py-24">
       <div className="mx-auto max-w-3xl">
-        <p className={eyebrow}>Questions</p>
+        <p className={`section-no ${eyebrow}`}>Questions</p>
         <h2 className="mt-4 text-balance text-4xl leading-tight text-ink">
           What people ask before installing.
         </h2>

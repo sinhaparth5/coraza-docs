@@ -17,7 +17,7 @@ export function DashboardSection() {
     <section className="border-b border-rule px-5 py-20 sm:px-8 lg:py-24">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-2xl text-center">
-          <p className={eyebrow}>Admin dashboard</p>
+          <p className={`section-no ${eyebrow}`}>Admin dashboard</p>
           <h2 className="mt-4 text-balance text-4xl leading-tight text-ink">
             See every decision as it happens.
           </h2>
@@ -50,7 +50,7 @@ export function DashboardSection() {
           </ul>
         </div>
 
-        <div className="mt-16 grid items-center gap-10 lg:grid-cols-[1fr_1.5fr]">
+        <div className="mt-16 grid grid-cols-[minmax(0,1fr)] items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
           <div>
             <h3 className="text-balance text-3xl leading-tight text-ink">
               Blocked a real customer? Fix it from the log.
@@ -72,7 +72,7 @@ export function DashboardSection() {
               <ArrowRightIcon aria-hidden="true" size={14} />
             </Link>
           </div>
-          <div className="rounded-lg border border-rule bg-paper p-4 sm:p-6">
+          <div className="crop-marks rounded-lg border border-rule bg-paper p-4 sm:p-6">
             <ExceptionStream />
             <p className="sr-only">
               Illustration: a live request log. A search for o'brien is blocked

@@ -7,6 +7,7 @@ import {
   secondaryButton,
 } from "./constants";
 import { CopyableCommand } from "./copyable-command";
+import { DimensionLine, Rosette } from "./ornaments";
 import { RequestStream } from "./request-stream";
 import { Scribble } from "./scribbles";
 
@@ -16,7 +17,7 @@ export async function HeroSection() {
   return (
     <section
       id="top"
-      className="relative border-b border-rule px-5 pb-16 pt-14 sm:px-8 lg:pb-24 lg:pt-20"
+      className="relative overflow-x-clip border-b border-rule px-5 pb-16 pt-14 sm:px-8 lg:pb-24 lg:pt-20"
     >
       {/* Notebook margin rule. */}
       <div
@@ -24,7 +25,10 @@ export async function HeroSection() {
         className="pointer-events-none absolute inset-y-0 left-3 hidden w-px bg-stamp/30 sm:block lg:left-8"
       />
 
-      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
+      {/* Engraved guilloche seal, peeking out behind the figure. */}
+      <Rosette className="pointer-events-none absolute -right-40 -top-28 size-[36rem] text-ink opacity-[0.09] lg:-right-24" />
+
+      <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
         <div>
           {release ? (
             <Link
@@ -33,10 +37,7 @@ export async function HeroSection() {
               rel="noreferrer"
               className="mb-5 inline-flex min-h-9 items-center gap-2 rounded-full border border-rule bg-paper-2 px-3 font-mono text-xs text-ink-soft no-underline transition-colors duration-200 hover:border-ink hover:text-ink"
             >
-              <span
-                aria-hidden="true"
-                className="size-1.5 rounded-full bg-accent"
-              />
+              <Rosette size="small" className="size-4 text-ink-soft" />
               latest release {release.tag}
               {release.date ? (
                 <span className="hidden sm:inline">
@@ -91,10 +92,11 @@ export async function HeroSection() {
               display="curl -fsSL …/install.sh | sudo bash"
               command="curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | sudo bash"
             />
+            <DimensionLine label="one line · one binary" className="mt-3" />
           </div>
         </div>
 
-        <div className="rounded-lg border border-rule bg-paper-2/70 p-4 sm:p-6">
+        <div className="crop-marks rounded-lg border border-rule bg-paper-2/70 p-4 sm:p-6">
           <RequestStream />
           <p className="sr-only">
             Illustration: a stream of HTTP requests moves toward the firewall.

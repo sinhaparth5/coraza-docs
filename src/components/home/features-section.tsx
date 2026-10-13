@@ -48,7 +48,7 @@ export function FeaturesSection() {
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-12 lg:grid-cols-[1fr_2fr]">
           <div>
-            <p className={eyebrow}>What's inside the binary</p>
+            <p className={`section-no ${eyebrow}`}>What's inside the binary</p>
             <h2 className="mt-4 text-balance text-4xl leading-tight text-ink">
               Six jobs, one process.
             </h2>

@@ -7,10 +7,10 @@ import { PipelineStream } from "./pipeline-stream";
 
 export function ArchitectureSection() {
   return (
-    <section className="border-b border-rule bg-paper-2/60 px-5 py-20 sm:px-8 lg:py-24">
+    <section className="grid-paper border-b border-rule bg-paper-2/60 px-5 py-20 sm:px-8 lg:py-24">
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
-          <p className={eyebrow}>The request pipeline</p>
+          <p className={`section-no ${eyebrow}`}>The request pipeline</p>
           <h2 className="mt-4 text-balance text-4xl leading-tight text-ink">
             Every request runs the same checks, in the same order.
           </h2>
@@ -20,7 +20,7 @@ export function ArchitectureSection() {
           </p>
         </div>
 
-        <div className="mt-12 rounded-lg border border-rule bg-paper p-4 sm:p-6">
+        <div className="crop-marks mt-12 rounded-lg border border-rule bg-paper p-4 sm:p-6">
           <PipelineStream />
           <p className="sr-only">
             Illustration: requests travel through five checkpoints. Headless

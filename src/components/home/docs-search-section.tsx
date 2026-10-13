@@ -52,14 +52,14 @@ export function DocsSearchSection() {
               onFocus={() => setFocused(true)}
               onBlur={() => setTimeout(() => setFocused(false), 150)}
               placeholder="e.g. trusted-proxies, rate limiting, webhook"
-              className="w-full bg-transparent text-sm text-pastel-green-950 placeholder:text-pastel-green-900/40 focus:outline-none dark:text-pastel-green-50 dark:placeholder:text-pastel-green-100/35"
+              className="w-full bg-transparent text-sm text-pastel-green-950 placeholder:text-pastel-green-900/65 focus:outline-none dark:text-pastel-green-50 dark:placeholder:text-pastel-green-100/65"
             />
           </div>
 
           {showPanel ? (
             <div className="absolute inset-x-0 top-full z-20 mt-2 max-h-96 overflow-y-auto rounded-2xl border border-pastel-green-700/15 bg-white shadow-[0_25px_60px_-25px_rgba(16,34,18,0.3)] dark:border-pastel-green-200/10 dark:bg-pastel-green-900">
               {query.isLoading ? (
-                <p className="px-4 py-4 text-sm text-pastel-green-900/50 dark:text-pastel-green-100/50">
+                <p className="px-4 py-4 text-sm text-pastel-green-900/65 dark:text-pastel-green-100/65">
                   Searching…
                 </p>
               ) : results.length > 0 ? (
@@ -73,7 +73,7 @@ export function DocsSearchSection() {
                         <p className="text-sm font-bold text-pastel-green-950 dark:text-pastel-green-50">
                           {cleanSnippet(result.content)}
                         </p>
-                        <p className="mt-0.5 truncate text-xs text-pastel-green-900/50 dark:text-pastel-green-100/45">
+                        <p className="mt-0.5 truncate text-xs text-pastel-green-900/65 dark:text-pastel-green-100/65">
                           {result.breadcrumbs?.join(" / ") ?? result.url}
                         </p>
                       </Link>
@@ -81,7 +81,7 @@ export function DocsSearchSection() {
                   ))}
                 </ul>
               ) : (
-                <p className="px-4 py-4 text-sm text-pastel-green-900/50 dark:text-pastel-green-100/50">
+                <p className="px-4 py-4 text-sm text-pastel-green-900/65 dark:text-pastel-green-100/65">
                   No matches. Try a different term.
                 </p>
               )}

@@ -39,7 +39,7 @@ export function StackComparisonSection() {
         <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch">
           <div className="flex flex-col justify-between rounded-2xl border border-dashed border-pastel-green-700/25 bg-pastel-green-100/50 p-8 dark:border-pastel-green-200/15 dark:bg-black/15">
             <div>
-              <p className="mb-6 text-center text-xs font-extrabold uppercase tracking-[0.16em] text-pastel-green-900/50 dark:text-pastel-green-100/40">
+              <p className="mb-6 text-center text-xs font-extrabold uppercase tracking-[0.16em] text-pastel-green-900/65 dark:text-pastel-green-100/65">
                 The usual way
               </p>
               <div className="flex flex-wrap items-center justify-center gap-3">
@@ -53,7 +53,7 @@ export function StackComparisonSection() {
                 ))}
               </div>
             </div>
-            <p className="mt-6 text-center text-[11px] text-pastel-green-900/45 dark:text-pastel-green-100/40">
+            <p className="mt-6 text-center text-xs text-pastel-green-900/65 dark:text-pastel-green-100/65">
               Separate services, separate configs, separate failure modes.
             </p>
           </div>
@@ -83,7 +83,7 @@ export function StackComparisonSection() {
                 ))}
               </ul>
             </div>
-            <p className="mt-6 text-center text-[11px] font-bold text-pixie-green-700 dark:text-pixie-green-300">
+            <p className="mt-6 text-center text-xs font-bold text-pixie-green-700 dark:text-pixie-green-300">
               1 binary. 1 process. 1 thing to deploy.
             </p>
           </div>

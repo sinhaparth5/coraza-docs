@@ -113,16 +113,18 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <HeroSection />
-      <StatsSection />
-      <FeaturesSection />
-      <StackComparisonSection />
-      <SecurityDepthSection />
-      <DashboardSection />
-      <ArchitectureSection />
-      <SelfContainedSection />
-      <InstallSection />
-      <FaqSection />
-      <DocsSearchSection />
+      <div id="main" className="home-reveal">
+        <StatsSection />
+        <FeaturesSection />
+        <StackComparisonSection />
+        <SecurityDepthSection />
+        <DashboardSection />
+        <ArchitectureSection />
+        <SelfContainedSection />
+        <InstallSection />
+        <FaqSection />
+        <DocsSearchSection />
+      </div>
       <FooterSection />
     </>
   );

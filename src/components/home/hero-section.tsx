@@ -4,6 +4,8 @@ import { DotGrid } from "@/components/decorative-shapes";
 import gradientImage from "@/static/img/Gradient.png";
 import shapeImage from "@/static/img/Shape.png";
 import { GITHUB_URL, primaryButton, secondaryButton } from "./constants";
+import { CopyableCommand } from "./copyable-command";
+import { HeroSearchButton } from "./hero-search-button";
 
 export function HeroSection() {
   return (
@@ -45,13 +47,13 @@ export function HeroSection() {
             priority
             quality={90}
             sizes="(max-width: 768px) 100vw, 1200px"
-            className="h-auto w-full opacity-90 drop-shadow-[0_24px_55px_rgba(53,97,57,0.12)] dark:opacity-25"
+            className="h-auto w-full opacity-90 drop-shadow-[0_24px_55px_rgba(53,97,57,0.12)] dark:opacity-45"
             aria-hidden="true"
           />
         </div>
 
         <div className="relative z-10 max-w-md self-end lg:col-start-2 lg:row-start-2 lg:-mb-11 lg:ml-auto">
-          <p className="mb-7 text-pretty text-base leading-7 text-pastel-green-900/75 sm:text-lg dark:text-pastel-green-100/75">
+          <p className="mb-7 text-pretty text-base leading-7 text-pastel-green-900/85 sm:text-lg dark:text-pastel-green-100/85">
             Run Coraza v3, OWASP CRS, TLS, routing, and an admin dashboard
             without Docker or an external database.
           </p>
@@ -67,6 +69,13 @@ export function HeroSection() {
             >
               View on GitHub
             </Link>
+          </div>
+          <div className="mt-5 flex flex-col gap-3">
+            <CopyableCommand
+              light
+              command="curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | sudo bash"
+            />
+            <HeroSearchButton />
           </div>
         </div>
       </div>

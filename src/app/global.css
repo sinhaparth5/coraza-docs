@@ -4,6 +4,8 @@
 
 @theme {
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
   --font-heading:
     var(--font-clash-grotesk), ui-sans-serif, system-ui, sans-serif;
 
@@ -61,7 +63,7 @@
   --color-fd-card-foreground: var(--color-sinbad-950);
   --color-fd-border: color-mix(
     in oklch,
-    var(--color-sinbad-500) 20%,
+    var(--color-sinbad-500) 28%,
     transparent
   );
   --color-fd-primary: var(--color-pixie-green-600);
@@ -96,7 +98,7 @@
   --color-fd-card-foreground: var(--color-sinbad-50);
   --color-fd-border: color-mix(
     in oklch,
-    var(--color-pixie-green-300) 20%,
+    var(--color-pixie-green-300) 28%,
     transparent
   );
   --color-fd-primary: var(--color-pixie-green-300);
@@ -137,4 +139,42 @@ h6 {
 html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* Scroll-reveal for home sections: CSS-only, no JS. Content stays visible
+   where animation-timeline is unsupported or motion is reduced. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .home-reveal > section > div {
+      animation: home-reveal both ease-out;
+      animation-timeline: view();
+      animation-range: entry 0% entry 30%;
+    }
+  }
+}
+
+@keyframes home-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override component animations */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override component animations */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override component animations */
+    transition-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override component animations */
+    scroll-behavior: auto !important;
+  }
 }

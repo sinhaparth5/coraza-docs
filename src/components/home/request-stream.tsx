@@ -48,6 +48,7 @@ type Shard = {
 function createScene(): Scene {
   let rows = 0;
   let wallX = 0;
+  let narrow = false;
   let packets: Packet[] = [];
   let shards: Shard[] = [];
   let stamps: { x: number; y: number; life: number }[] = [];
@@ -59,7 +60,8 @@ function createScene(): Scene {
   return {
     resize({ width, height }) {
       rows = Math.max(4, Math.floor((height - CELL_H * 3) / (CELL_H * 1.5)));
-      wallX = Math.round(width * (width < 520 ? 0.68 : 0.74));
+      narrow = width < 520;
+      wallX = Math.round(width * (narrow ? 0.62 : 0.74));
     },
 
     step(dt, { width, cw }) {
@@ -94,8 +96,9 @@ function createScene(): Scene {
             shards.push({
               x: p.x + i * cw,
               y,
-              vx: -20 - Math.random() * 40,
-              vy: -30 + Math.random() * 80,
+              // On phones the lanes are close, so shards stay near their own.
+              vx: narrow ? -10 - Math.random() * 20 : -20 - Math.random() * 40,
+              vy: narrow ? -10 + Math.random() * 25 : -30 + Math.random() * 80,
               life: 1,
               ch: p.text[i] === " " ? "·" : p.text[i],
             });
@@ -108,7 +111,7 @@ function createScene(): Scene {
       for (const s of shards) {
         s.x += s.vx * dt;
         s.y += s.vy * dt;
-        s.vy += 140 * dt;
+        s.vy += (narrow ? 50 : 140) * dt;
         s.life -= dt * 0.9;
       }
       shards = shards.filter((s) => s.life > 0);
@@ -136,7 +139,8 @@ function createScene(): Scene {
       ctx.fillStyle = colors.soft;
       ctx.fillText("internet", 0, CELL_H * 0.6);
       ctx.fillText("palisade", wallX + WALL_W / 2 - cw * 4, CELL_H * 0.6);
-      ctx.fillText("backend", width - 7 * cw, CELL_H * 0.6);
+      const backend = narrow ? "app" : "backend";
+      ctx.fillText(backend, width - backend.length * cw, CELL_H * 0.6);
 
       ctx.fillStyle = colors.stamp;
       for (const s of shards) {

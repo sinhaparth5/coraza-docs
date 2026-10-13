@@ -49,18 +49,30 @@ function createScene(): Scene {
   let banStamp = 0;
   let mail = -1; // 0..1 progress of the alert envelope, -1 when idle
 
-  const visitorY = CELL_H * 2;
-  const laneY = CELL_H * 3.6;
-  // Verdicts get their own row so they never sit on top of the next probe.
-  const verdictY = CELL_H * 5.1;
-  const scoreY = CELL_H * 7;
-  const rulesY = CELL_H * 8.6;
+  let narrow = false;
+  let visitorY = 0;
+  let laneY = 0;
+  let verdictY = 0;
+  let scoreY = 0;
+  let rulesY = 0;
 
   return {
     resize({ width, cw }) {
-      x0 = 12 * cw;
-      listX = Math.round(Math.max(x0 + 14 * cw, width * 0.45));
-      wallX = Math.round(width * 0.7);
+      // Phones have no room for a label gutter, so the visitor and IP labels
+      // move above their lanes and the lanes start at the left edge.
+      narrow = width < 520;
+      const k = narrow ? 1.25 : 0;
+      visitorY = CELL_H * (2 + k);
+      laneY = CELL_H * (3.6 + 2 * k);
+      // Verdicts get their own row so they never sit on top of the next probe.
+      verdictY = CELL_H * (5.1 + 2 * k);
+      scoreY = CELL_H * (7 + 2 * k);
+      rulesY = CELL_H * (8.6 + 2 * k);
+      x0 = narrow ? 0 : 12 * cw;
+      listX = narrow
+        ? Math.round(width * 0.42)
+        : Math.round(Math.max(x0 + 14 * cw, width * 0.45));
+      wallX = Math.round(width * (narrow ? 0.74 : 0.7));
     },
 
     step(dt, { width, cw }) {
@@ -164,9 +176,10 @@ function createScene(): Scene {
       ctx.fillText("blocklist", listX + GATE_W / 2 - 4.5 * cw, CELL_H * 0.6);
       ctx.fillText("waf", wallX + GATE_W / 2 - 1.5 * cw, CELL_H * 0.6);
       ctx.fillText("inbox", width - 5 * cw, CELL_H * 0.6);
-      ctx.fillText("visitor", 0, visitorY);
+      const labelDy = narrow ? -CELL_H * 1.1 : 0;
+      ctx.fillText("visitor", 0, visitorY + labelDy);
       ctx.fillStyle = colors.stamp;
-      ctx.fillText(ATTACKERS[attacker], 0, laneY);
+      ctx.fillText(ATTACKERS[attacker], 0, laneY + labelDy);
 
       for (const n of notes) {
         ctx.globalAlpha = Math.min(1, n.life * 1.6);
@@ -174,7 +187,10 @@ function createScene(): Scene {
       }
       if (banStamp > 0) {
         ctx.globalAlpha = Math.min(1, banStamp * 3);
-        ctx.fillText("[auto-ban]", 0, verdictY);
+        // Phones need the verdict row for the blocklist note, so the ban
+        // stamp sits at the end of the score meter instead.
+        if (narrow) ctx.fillText("[auto-ban]", width - 10 * cw, scoreY);
+        else ctx.fillText("[auto-ban]", 0, verdictY);
       }
       if (mail >= 0) {
         const e = 1 - (1 - mail) ** 3;
@@ -222,7 +238,7 @@ export function AutobanStream() {
   return (
     <figure className="m-0">
       <div aria-hidden="true">
-        <canvas ref={canvasRef} className="block h-60 w-full" />
+        <canvas ref={canvasRef} className="block h-64 w-full sm:h-60" />
       </div>
       <figcaption className="mt-3 font-hand text-xl text-ink-soft">
         fig. 4: ten points in ten minutes and the IP is banned for good

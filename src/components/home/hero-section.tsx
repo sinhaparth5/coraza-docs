@@ -73,6 +73,7 @@ export function HeroSection() {
           <div className="mt-5 flex flex-col gap-3">
             <CopyableCommand
               light
+              display="curl -fsSL …/install.sh | sudo bash"
               command="curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | sudo bash"
             />
             <HeroSearchButton />

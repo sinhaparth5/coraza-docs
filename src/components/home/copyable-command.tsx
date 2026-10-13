@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { CheckIcon, CopyIcon } from "@/components/icons";
 
-export function CopyableCommand({ command }: { command: string }) {
+export function CopyableCommand({
+  command,
+  light = false,
+}: {
+  command: string;
+  light?: boolean;
+}) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -25,7 +31,9 @@ export function CopyableCommand({ command }: { command: string }) {
   }
 
   return (
-    <div className="mb-5 flex flex-col items-stretch justify-between gap-4 rounded-xl border border-white/10 bg-white/5 p-4 text-left transition-colors duration-200 hover:border-white/20 sm:flex-row sm:items-start sm:p-5">
+    <div
+      className={`flex flex-col items-stretch justify-between gap-4 rounded-xl border p-4 text-left transition-colors duration-200 sm:flex-row sm:items-start sm:p-5 ${light ? "mb-0 border-pastel-green-700/20 bg-pastel-green-950 hover:border-pastel-green-700/40" : "mb-5 border-white/10 bg-white/5 hover:border-white/20"}`}
+    >
       <code className="min-w-0 whitespace-pre-wrap break-all bg-transparent p-0 font-mono text-[0.8125rem] leading-7 text-white/90 sm:break-words sm:text-sm">
         <span className="select-none text-pastel-green-300">$ </span>
         {command}

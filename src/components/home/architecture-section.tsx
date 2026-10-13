@@ -51,13 +51,15 @@ export function ArchitectureSection() {
               <ArrowRightIcon aria-hidden="true" size={14} />
             </Link>
           </div>
-          <Image
-            src={archDiagram}
-            alt="Coraza WAF Mod request architecture from the client through Cloudflare and OS firewall to the WAF proxy, SQLite, dashboard, and backend"
-            sizes="(max-width: 1280px) 92vw, 1152px"
-            quality={88}
-            className="h-auto w-full"
-          />
+          <div className="overflow-hidden rounded-xl border border-pastel-green-700/15 bg-white p-2 sm:p-4">
+            <Image
+              src={archDiagram}
+              alt="Coraza WAF Mod request architecture from the client through Cloudflare and OS firewall to the WAF proxy, SQLite, dashboard, and backend"
+              sizes="(max-width: 1280px) 92vw, 1152px"
+              quality={88}
+              className="h-auto w-full"
+            />
+          </div>
         </div>
       </div>
     </section>

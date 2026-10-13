@@ -1,6 +1,6 @@
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
 import { CookieConsentBanner } from "@/components/cookie-consent";
@@ -11,6 +11,11 @@ import "./global.css";
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
 });
 
 const clashGrotesk = localFont({
@@ -79,7 +84,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${clashGrotesk.variable} ${dmSans.className}`}
+      className={`${dmSans.variable} ${jetbrainsMono.variable} ${clashGrotesk.variable} ${dmSans.className}`}
       suppressHydrationWarning
     >
       <Script
@@ -88,6 +93,12 @@ export default function Layout({ children }: LayoutProps<"/">) {
         strategy="afterInteractive"
       />
       <body className="flex flex-col min-h-screen">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-fd-primary focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-fd-primary-foreground"
+        >
+          Skip to content
+        </a>
         <RootProvider>{children}</RootProvider>
         <CookieConsentBanner />
       </body>

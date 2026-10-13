@@ -64,7 +64,7 @@ export function PipelineFlow() {
               }`}
             >
               {active ? (
-                <span className="absolute -top-2.5 left-5 rounded-full bg-pixie-green-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white dark:bg-pixie-green-400 dark:text-pastel-green-950">
+                <span className="absolute -top-2.5 left-5 rounded-full bg-pixie-green-600 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white dark:bg-pixie-green-400 dark:text-pastel-green-950">
                   Now inspecting
                 </span>
               ) : null}

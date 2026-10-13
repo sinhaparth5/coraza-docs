@@ -1,4 +1,6 @@
-export const appName = "Coraza WAF Mod";
+export const appName = "Palisade";
+export const siteUrl = "https://waf.astrareconslabs.com";
+export const siteTagline = "WAF and reverse proxy in a single Go binary";
 export const docsRoute = "/docs";
 export const docsImageRoute = "/og/docs";
 export const docsContentRoute = "/llms.mdx/docs";

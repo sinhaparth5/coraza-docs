@@ -1,17 +1,17 @@
 ---
 slug: introducing-coraza-waf-mod
 date: 2026-07-01
-title: "Introducing Coraza WAF Mod: A WAF in a Single Binary"
+title: "Introducing Palisade: A WAF in a Single Binary"
 authors: [parth]
 tags: [release, waf, security, go]
-description: Coraza WAF Mod puts OWASP CRS protection, an admin dashboard, IP and geo blocking, rate limiting, and TLS termination in a single Go binary.
+description: Palisade puts OWASP CRS protection, an admin dashboard, IP and geo blocking, rate limiting, and TLS termination in a single Go binary.
 image: /img/seo_image.jpg
 keywords: [coraza, waf, web application firewall, owasp crs, go, reverse proxy, security, ip blocking, rate limiting, tls]
 ---
 
-I wanted WAF protection for a self-hosted project without paying for a managed CDN service or maintaining a custom ModSecurity build. Coraza WAF Mod came out of that need.
+I wanted WAF protection for a self-hosted project without paying for a managed CDN service or maintaining a custom ModSecurity build. Palisade came out of that need.
 
-Coraza WAF Mod is a reverse proxy and Web Application Firewall packaged as a single Go binary. Put it in front of your services and run one command. It provides OWASP Core Rule Set protection, an admin dashboard, IP and geo blocking, rate limiting, per-service TLS, and bot protection without changes to application code or a separate config file.
+Palisade is a reverse proxy and Web Application Firewall packaged as a single Go binary. Put it in front of your services and run one command. It provides OWASP Core Rule Set protection, an admin dashboard, IP and geo blocking, rate limiting, per-service TLS, and bot protection without changes to application code or a separate config file.
 
 {/* truncate */}
 
@@ -25,7 +25,7 @@ I couldn't find a self-hosted WAF that fit on one VPS and had an admin UI I want
 
 ## A WAF with no runtime dependencies
 
-Coraza WAF Mod compiles the WAF engine and OWASP CRS into the binary at build time. There are no modules to load, rule files to download, or sidecar processes to run. Starting the binary starts both the WAF and reverse proxy.
+Palisade compiles the WAF engine and OWASP CRS into the binary at build time. There are no modules to load, rule files to download, or sidecar processes to run. Starting the binary starts both the WAF and reverse proxy.
 
 The WAF engine is [Coraza v3](https://coraza.io), the OWASP-backed Go implementation of the ModSecurity ruleset. The CRS is compiled in with `SecRuleEngine On` applied after the CRS includes, so rules actually block rather than merely score. Out of the box it blocks:
 
@@ -40,7 +40,7 @@ If a CRS rule fires too aggressively on your application, you can disable it by 
 
 ## The admin dashboard
 
-![Coraza WAF Mod admin dashboard showing live traffic chart, requests today, blocked today, bot shield summary, and top threats panel](/img/docs/docs_dashboard.png)
+![Palisade admin dashboard showing live traffic chart, requests today, blocked today, bot shield summary, and top threats panel](/img/docs/docs_dashboard.png)
 
 The dashboard at `/admin` controls the running service. HTMX updates only the affected part of the page when you add a service, block an IP, or disable a rule. Each change takes effect immediately, without a restart or deployment.
 
@@ -72,7 +72,7 @@ The rate limiter is enforced against the real client IP, which means it can't be
 
 ## TLS termination
 
-Coraza WAF Mod terminates TLS for your services so your backends can stay on plain HTTP. Certificates are managed through the dashboard in three ways:
+Palisade terminates TLS for your services so your backends can stay on plain HTTP. Certificates are managed through the dashboard in three ways:
 
 - **Upload** a cert/key pair for a specific service
 - Store named certificates in the pool and assign them to multiple services

@@ -1,17 +1,17 @@
 import type { MetadataRoute } from "next";
-import { appName } from "@/lib/shared";
+import { appName, siteTagline } from "@/lib/shared";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: appName,
     short_name: appName,
-    description:
-      "One binary. Full WAF protection. A reverse proxy with OWASP CRS, live dashboard, IP and geo blocking, and TLS termination.",
+    description: `${appName}: ${siteTagline}. OWASP CRS inspection, reverse proxy, TLS, rate limiting and a live dashboard.`,
     start_url: "/",
     display: "browser",
-    background_color: "#ffffff",
-    theme_color: "#2b5c74",
+    background_color: "#f8f4ec",
+    theme_color: "#1c2a23",
     lang: "en",
+    categories: ["security", "developer", "utilities"],
     icons: [
       {
         src: "/icon.svg",

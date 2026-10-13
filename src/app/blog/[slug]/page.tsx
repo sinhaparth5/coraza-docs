@@ -15,9 +15,8 @@ import {
   getBlogPosts,
   getBlogTagLabel,
 } from "@/lib/blog";
+import { appName, siteUrl as baseUrl } from "@/lib/shared";
 import { blogSource } from "@/lib/source";
-
-const baseUrl = "https://waf.astrareconslabs.com";
 
 export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
   const { slug } = await props.params;
@@ -42,9 +41,13 @@ export default async function BlogPostPage(props: PageProps<"/blog/[slug]">) {
       name: author.name,
       url: author.url,
     })),
+    dateModified: page.data.date,
+    keywords: page.data.keywords?.join(", "),
+    isPartOf: { "@id": `${baseUrl}/#website` },
     publisher: {
       "@type": "Organization",
-      name: "Coraza WAF Mod",
+      "@id": `${baseUrl}/#organization`,
+      name: appName,
       logo: {
         "@type": "ImageObject",
         url: `${baseUrl}/img/logo.svg`,
@@ -131,23 +134,38 @@ export async function generateMetadata(
   if (!page) notFound();
 
   const image = getBlogImage(page.data.slug);
+  const ogImage = {
+    url: image.src,
+    width: image.width,
+    height: image.height,
+    alt: page.data.title,
+  };
 
   return {
     title: page.data.title,
     description: page.data.description,
     keywords: page.data.keywords,
+    alternates: { canonical: page.url },
+    authors: getBlogAuthors(page.data.authors).map((author) => ({
+      name: author.name,
+      url: author.url,
+    })),
     openGraph: {
       type: "article",
+      siteName: appName,
+      url: page.url,
+      title: page.data.title,
+      description: page.data.description,
       publishedTime: page.data.date,
+      authors: getBlogAuthors(page.data.authors).map((author) => author.name),
       tags: page.data.tags,
-      images: [
-        {
-          url: image.src,
-          width: image.width,
-          height: image.height,
-          alt: page.data.title,
-        },
-      ],
+      images: [ogImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: page.data.title,
+      description: page.data.description,
+      images: [ogImage],
     },
   };
 }

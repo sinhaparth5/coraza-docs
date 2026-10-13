@@ -135,6 +135,23 @@ service, reason, when it was added) and lets you re-enable one
 Rules" table's Active/Disabled badge reflect only the **global** list. A rule scoped to one service
 is still shown as active globally, which keeps global and service-specific state distinct.
 
+You can also create a scoped exception straight from a blocked request: open it on the **Logs** page
+and click **Create exception**. See [Request logs](/docs/configuration/dashboard#request-logs).
+
+## Dry-run candidate rules
+
+The **Dry-run Rules** card on the WAF Rules page (`POST /admin/waf-rules/dry-run`) lets you test rules
+before deploying them. Paste candidate rules and replay the last N logged requests (up to 2000)
+through two throwaway engines: the current global rules, and the current rules plus your candidates.
+The card lists every request whose verdict would change.
+
+Nothing is saved and live traffic is never touched.
+
+:::note
+Request bodies aren't stored in the request log, so rules that inspect bodies can't match during a
+replay.
+:::
+
 ## WAF detects without blocking
 
 Make sure you're on a normal build (blocking is enabled after the CRS includes by design), and check

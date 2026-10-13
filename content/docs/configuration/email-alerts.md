@@ -6,7 +6,7 @@ keywords: [email alerts, daily report, ban alert, cloudflare email]
 ---
 
 
-Coraza WAF Mod sends two kinds of email via **Cloudflare Email Service** (SMTPS — no external SMTP
+Palisade sends two kinds of email via **Cloudflare Email Service** (SMTPS — no external SMTP
 provider needed):
 
 - **Daily traffic report** — sent just after local midnight, covering the completed day: total
@@ -39,7 +39,7 @@ The token is stored in the database (meta keys `email_enabled`, `email_token`, `
 echoed back to the UI** once saved, so on subsequent saves leave the token field blank to keep the
 existing value.
 
-Alerts arrive with a display name so they show up as *Coraza WAF Mod* in your inbox. Gmail strips
+Alerts arrive with a display name so they show up as *Palisade* in your inbox. Gmail strips
 inline SVG from HTML email, so the logo badge in the template is built from plain HTML/CSS (a green
 rounded square with three bars) rather than an SVG image.
 

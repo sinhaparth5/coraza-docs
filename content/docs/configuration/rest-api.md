@@ -6,7 +6,7 @@ keywords: [rest api, bearer token, api keys, services api, ip rules api]
 ---
 
 
-Alongside the session-cookie dashboard, Coraza WAF Mod exposes a `Bearer`-token authenticated REST
+Alongside the session-cookie dashboard, Palisade exposes a `Bearer`-token authenticated REST
 API at **`{admin path}/api/v1/*`** (default `/admin/api/v1`) — a separate Echo route group, sibling
 to the dashboard group rather than nested inside it.
 

@@ -6,14 +6,23 @@ keywords: [prometheus, metrics, monitoring, exposition format]
 ---
 
 
-Coraza WAF Mod exposes a Prometheus exposition endpoint at **`/admin/metrics`**.
+Palisade exposes a Prometheus exposition endpoint at **`/admin/metrics`**.
 
-:::warning[It is behind session-cookie auth, not HTTP Basic Auth]
-The endpoint is protected by the **same session-cookie admin authentication** as every other dashboard
-page — it is **not** HTTP Basic Auth. A Prometheus `basic_auth:` scrape config therefore cannot
-authenticate to it: an unauthenticated scrape is redirected (302) to the login page rather than
-challenged for credentials. Scraping it currently requires either a code change to exempt the route,
-or proxying through something that holds a valid admin session cookie.
+:::tip[Scrape with an API key]
+`/admin/metrics` uses the dashboard's session-cookie login, so a Prometheus job can't authenticate to
+it. Scrape **`GET /admin/api/v1/metrics`** instead: it returns the same metrics and accepts a
+[REST API](/docs/configuration/rest-api) bearer key. A read-only key is enough.
+
+```yaml
+scrape_configs:
+  - job_name: coraza-waf-mod
+    metrics_path: /admin/api/v1/metrics
+    authorization:
+      type: Bearer
+      credentials_file: /etc/prometheus/coraza.key
+    static_configs:
+      - targets: ["waf.example.com:8080"]
+```
 :::
 
 ## Metric reference
@@ -58,3 +67,17 @@ coraza_log_queue_depth 0
 
 For the live in-dashboard view of the same data, see the [dashboard home](/docs/configuration/dashboard)
 (traffic and threat charts).
+
+## Health probes
+
+Two unauthenticated endpoints answer on every host, and are left out of the stdout request log:
+
+| Endpoint | Returns `200` when | Otherwise |
+|---|---|---|
+| `GET /_cz/healthz` | the process is up (liveness) | — |
+| `GET /_cz/readyz` | the database answers a ping within 2 s (readiness) | `503 db unavailable` |
+
+Both also accept `HEAD`. Point a Kubernetes `livenessProbe`/`readinessProbe` or a load balancer
+health check at them. Without curl, use the
+[`healthcheck` subcommand](/docs/configuration/cli), which is what the Docker image's `HEALTHCHECK`
+runs.

@@ -19,7 +19,7 @@ proxied alike):
   (`c.Request().TLS != nil`) so a plain-HTTP dev setup is never told to force HTTPS
 - `X-WAF-Engine: Coraza v3 / OWASP CRS`
 
-The `Server` header on every response is forced to `Coraza WAF Mod`, overwriting whatever the
+The `Server` header on every response is forced to `Palisade`, overwriting whatever the
 backend sent.
 
 :::note[No `X-Protected-By` header]

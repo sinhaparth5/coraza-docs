@@ -6,7 +6,7 @@ keywords: [rate limiting, token bucket, redis, per-ip limiting]
 ---
 
 
-Coraza WAF Mod applies **per-client-IP token-bucket** limiting globally ahead of geo/WAF inspection,
+Palisade applies **per-client-IP token-bucket** limiting globally ahead of geo/WAF inspection,
 plus optional **per-service** limits. There are two interchangeable backends, chosen from the
 dashboard (**Settings → Rate limiting**); switching is a hot reload with no restart.
 

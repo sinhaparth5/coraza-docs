@@ -10,18 +10,42 @@ import {
   getBlogPosts,
   getBlogTagLabel,
 } from "@/lib/blog";
+import seoImage from "@/static/img/seo_image.jpg";
+
+const ogImage = {
+  url: seoImage.src,
+  width: seoImage.width,
+  height: seoImage.height,
+  alt: "Palisade blog",
+};
 
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Release notes, security research, and engineering updates from Coraza WAF Mod.",
+    "Release notes, security research, and engineering updates from Palisade.",
   keywords: [
-    "coraza waf mod blog",
+    "palisade waf blog",
     "waf release notes",
     "web application firewall",
     "security engineering",
     "go security",
   ],
+  alternates: { canonical: "/blog" },
+  openGraph: {
+    type: "website",
+    url: "/blog",
+    title: "Blog · Palisade",
+    description:
+      "Release notes, security research, and engineering updates from Palisade.",
+    images: [ogImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog · Palisade",
+    description:
+      "Release notes, security research, and engineering updates from Palisade.",
+    images: [ogImage],
+  },
 };
 
 export default function BlogPage() {
@@ -35,7 +59,7 @@ export default function BlogPage() {
         <DotGrid className="inset-0 text-pastel-green-700/[0.05] dark:text-pastel-green-200/[0.05]" />
         <div className="relative mx-auto max-w-5xl">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-pastel-green-700 dark:text-pastel-green-300">
-            Coraza WAF Mod
+            Palisade
           </p>
           <h1 className="mt-3 text-balance text-3xl font-extrabold tracking-[-0.035em] sm:text-4xl">
             Security engineering notes

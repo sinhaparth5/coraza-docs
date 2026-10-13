@@ -1,110 +1,158 @@
 import type { Metadata } from "next";
 import {
   ArchitectureSection,
+  AutobanSection,
   DashboardSection,
-  DocsSearchSection,
   FaqSection,
   FeaturesSection,
   FooterSection,
   HeroSection,
   InstallSection,
-  SecurityDepthSection,
-  SelfContainedSection,
-  StackComparisonSection,
-  StatsSection,
 } from "@/components/home";
-import { faqItems } from "@/components/home/constants";
+import { faqItems, GITHUB_URL } from "@/components/home/constants";
+import { getLatestRelease, type Release } from "@/lib/release";
+import { appName, siteUrl } from "@/lib/shared";
 import seoImage from "@/static/img/seo_image.jpg";
 
-const title = "Coraza WAF Mod: WAF and reverse proxy in a single Go binary";
+const title = `${appName}: open-source WAF and reverse proxy in one Go binary`;
 const description =
-  "A single Go binary combining OWASP CRS inspection, reverse proxy routing, TLS, rate limiting, and an admin dashboard. No Docker or database server needed.";
+  "A free, self-hosted web application firewall for Linux. OWASP CRS inspection, reverse proxy routing, TLS, rate limiting, automatic IP bans and a live dashboard in one Go binary. No Docker, no database server.";
+const ogImage = {
+  url: seoImage.src,
+  width: seoImage.width,
+  height: seoImage.height,
+  alt: `${appName}: a web application firewall you can scp to a server`,
+};
 
 export const metadata: Metadata = {
   title: { absolute: title },
   description,
   keywords: [
-    "coraza waf mod",
+    "palisade waf",
     "web application firewall",
+    "open source waf",
+    "self-hosted waf",
     "reverse proxy",
     "owasp crs",
     "coraza v3",
     "go waf",
     "single binary waf",
+    "modsecurity alternative",
     "admin dashboard",
     "ip and geo blocking",
+    "automatic ip ban",
+    "ja4 fingerprinting",
     "bot protection",
     "rate limiting",
     "tls termination",
+    "lets encrypt",
     "sqlite",
-    "mysql",
-    "postgres",
   ],
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    siteName: "Coraza WAF Mod",
+    siteName: appName,
     type: "website",
     locale: "en_US",
     url: "/",
     title,
     description,
-    images: [seoImage.src],
+    images: [ogImage],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
-    images: [seoImage.src],
+    images: [ogImage],
   },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "SoftwareApplication",
-      name: "Coraza WAF Mod",
-      description:
-        "A single-binary Web Application Firewall and reverse proxy for Linux, built on Coraza v3 and the OWASP Core Rule Set.",
-      url: "https://waf.astrareconslabs.com",
-      applicationCategory: "SecurityApplication",
-      operatingSystem: "Linux",
-      license: "https://www.apache.org/licenses/LICENSE-2.0",
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
+function buildJsonLd(release: Release | null) {
+  const organization = { "@id": `${siteUrl}/#organization` };
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}/#website`,
+        url: siteUrl,
+        name: appName,
+        description,
+        inLanguage: "en",
+        publisher: organization,
       },
-      author: {
-        "@type": "Person",
-        name: "Parth Sinha",
-        url: "https://parthsinha.com",
+      {
+        "@type": "Organization",
+        ...organization,
+        name: appName,
+        url: siteUrl,
+        logo: `${siteUrl}/img/logo.svg`,
+        sameAs: [GITHUB_URL],
       },
-    },
-    {
-      "@type": "Organization",
-      name: "Coraza WAF Mod",
-      url: "https://waf.astrareconslabs.com",
-      logo: "https://waf.astrareconslabs.com/img/logo.svg",
-      sameAs: ["https://github.com/sinhaparth5/coraza-waf-mod"],
-    },
-    {
-      "@type": "FAQPage",
-      mainEntity: faqItems.map((item) => ({
-        "@type": "Question",
-        name: item.question,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: item.answer,
+      {
+        "@type": "SoftwareApplication",
+        "@id": `${siteUrl}/#software`,
+        name: appName,
+        description:
+          "A single-binary web application firewall and reverse proxy for Linux, built on OWASP Coraza v3 and the OWASP Core Rule Set.",
+        url: siteUrl,
+        image: `${siteUrl}${seoImage.src}`,
+        applicationCategory: "SecurityApplication",
+        applicationSubCategory: "Web application firewall",
+        operatingSystem: "Linux",
+        isAccessibleForFree: true,
+        license: "https://www.apache.org/licenses/LICENSE-2.0",
+        downloadUrl: `${GITHUB_URL}/releases/latest`,
+        installUrl: `${siteUrl}/docs/installation/install`,
+        softwareHelp: `${siteUrl}/docs`,
+        ...(release
+          ? {
+              softwareVersion: release.tag.replace(/^v/, ""),
+              releaseNotes: release.url,
+              ...(release.date
+                ? { dateModified: release.date.slice(0, 10) }
+                : {}),
+            }
+          : {}),
+        featureList: [
+          "OWASP Core Rule Set inspection with Coraza v3",
+          "Reverse proxy with host and path routing",
+          "Per-service TLS with Let's Encrypt",
+          "Rate limiting and IP and geo blocking",
+          "Automatic IP banning with email alerts",
+          "Live admin dashboard with request logs",
+          "Prometheus metrics and health probes",
+        ],
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
         },
-      })),
-    },
-  ],
-};
+        author: {
+          "@type": "Person",
+          name: "Parth Sinha",
+          url: "https://parthsinha.com",
+        },
+        publisher: organization,
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.answer,
+          },
+        })),
+      },
+    ],
+  };
+}
 
-export default function HomePage() {
+export default async function HomePage() {
+  const jsonLd = buildJsonLd(await getLatestRelease());
   return (
     <>
       <script
@@ -112,20 +160,18 @@ export default function HomePage() {
         // biome-ignore lint/security/noDangerouslySetInnerHtml: static, non-user-controlled JSON-LD
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HeroSection />
-      <div id="main" className="home-reveal">
-        <StatsSection />
-        <FeaturesSection />
-        <StackComparisonSection />
-        <SecurityDepthSection />
-        <DashboardSection />
-        <ArchitectureSection />
-        <SelfContainedSection />
-        <InstallSection />
-        <FaqSection />
-        <DocsSearchSection />
+      <div className="field-notes paper-grain flex flex-1 flex-col bg-paper text-ink">
+        <HeroSection />
+        <div id="main" className="home-reveal">
+          <FeaturesSection />
+          <ArchitectureSection />
+          <AutobanSection />
+          <DashboardSection />
+          <InstallSection />
+          <FaqSection />
+        </div>
+        <FooterSection />
       </div>
-      <FooterSection />
     </>
   );
 }

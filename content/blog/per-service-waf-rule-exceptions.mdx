@@ -9,7 +9,7 @@ image: /img/seo_image.jpg
 keywords: [coraza, waf, owasp crs, false positive, rule 911100, allowed methods, per-service, waf tuning]
 ---
 
-A backend team using Coraza WAF Mod received a `403` for every `PATCH` to a REST endpoint. CRS rule `911100` caused the block. Disabling it globally fixed the endpoint but also removed HTTP-method enforcement from every other service, so the exception needed a narrower scope.
+A backend team using Palisade received a `403` for every `PATCH` to a REST endpoint. CRS rule `911100` caused the block. Disabling it globally fixed the endpoint but also removed HTTP-method enforcement from every other service, so the exception needed a narrower scope.
 
 {/* truncate */}
 
@@ -43,7 +43,7 @@ GET HEAD POST OPTIONS
 
 `PATCH`, `PUT`, and `DELETE` are not on the list. CRS uses this conservative default because many sites do not need mutation methods. A REST API often depends on them for routine CRUD operations, causing rule `911100` to block valid updates and deletes.
 
-Coraza WAF Mod enables blocking with `SecRuleEngine On` after the CRS includes. CRS defaults to `DetectionOnly`, and an earlier ordering mistake in this project left that default active. In this case, rule `911100` blocked the request as configured.
+Palisade enables blocking with `SecRuleEngine On` after the CRS includes. CRS defaults to `DetectionOnly`, and an earlier ordering mistake in this project left that default active. In this case, rule `911100` blocked the request as configured.
 
 ## The wrong fix: disable it globally
 

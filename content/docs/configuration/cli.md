@@ -25,10 +25,12 @@ Start the WAF/proxy/dashboard by running the binary with any of these flags:
 | `--certs` | `./certs` | TLS certificate cache directory (Let's Encrypt files). |
 | `--waf-rules` | *(empty)* | Directory of extra `.conf` WAF rules, loaded on top of OWASP CRS. |
 | `--geo-db` | *(empty)* | Path to an external `GeoLite2-Country.mmdb`. Empty = use bundled DB. |
-| `--retention` | `30` | Request-log retention in days. `0` = keep forever (used by `prune`). |
+| `--retention` | `30` | Request-log retention in days. `0` = keep forever (used by `prune` and `--prune-interval`). |
+| `--prune-interval` | `0` | Prune request logs older than `--retention` and expired sessions **in-process** at this interval, e.g. `24h`. `0` = off. For deployments with no cron or systemd timer, such as Docker. See [Log Retention & Pruning](/docs/configuration/log-retention). |
+| `--warehouse-url` | *(empty)* | ClickHouse HTTP endpoint to mirror telemetry to, e.g. `http://clickhouse:8123/?database=waf`. Empty = disabled. See [ClickHouse Analytics](/docs/configuration/analytics). |
 | `--tls-cert` | *(empty)* | PEM certificate file for the HTTPS fallback (self-signed). |
 | `--tls-key` | *(empty)* | Matching PEM private key for `--tls-cert`. |
-| `--access-log` | *(empty)* | nginx-combined-format access log file path. Empty = disabled. See [Access Log](/docs/configuration/access-log). |
+| `--access-log` | *(empty)* | nginx-combined-format access log file path. Empty = disabled. `install.sh` sets it to `/var/log/coraza/access.log`. See [Access Log](/docs/configuration/access-log). |
 | `--access-log-max-size-mb` | `100` | Rotate the access log after it reaches this many MB. |
 | `--access-log-max-backups` | `5` | Number of rotated access log files (`access.log.1`, `.2`, …) to keep. |
 
@@ -88,7 +90,17 @@ coraza-waf-mod prune --db-driver sqlite --db waf.db --retention 30 --vacuum
 - `--vacuum` reclaims space after deletion. SQLite runs a full rebuild plus WAL truncate and reports
   before/after size; Postgres runs its in-place `VACUUM`; MySQL treats the flag as a documented no-op.
 - `--retention 0` or negative disables pruning. Intended to be run by cron or the bundled systemd
-  timer, never inside the live server process. See [Log Retention & Pruning](/docs/configuration/log-retention).
+  timer. For setups with no scheduler, use `--prune-interval` on the server instead. See [Log Retention & Pruning](/docs/configuration/log-retention).
+
+### `healthcheck` — probe a running server
+
+```bash
+coraza-waf-mod healthcheck --url http://127.0.0.1:8080/_cz/readyz
+```
+
+- Requests the readiness URL (default `http://127.0.0.1:8080/_cz/readyz`) and exits non-zero unless
+  it returns `200`. The Docker image is built `FROM scratch` with no `curl` or `wget`, so its
+  `HEALTHCHECK` uses this subcommand. See [Health probes](/docs/configuration/metrics#health-probes).
 
 ### `build-dsn` — safely construct an external database DSN
 

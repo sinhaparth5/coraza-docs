@@ -26,11 +26,11 @@ Every request runs through a single `Handle` method, in strict order:
 
 Every stage logs the outcome via a **non-blocking queue** (buffered channel drained by one worker
 goroutine), so the hot path never waits on the database. Every response — blocked or proxied — gets
-its `Server` header forced to `Coraza WAF Mod` and the standard security headers applied.
+its `Server` header forced to `Palisade` and the standard security headers applied.
 
 ## Reverse proxy & multi-app routing
 
-Coraza WAF Mod routes to as many backend apps ("services") as you need from a single front door.
+Palisade routes to as many backend apps ("services") as you need from a single front door.
 Two match modes per service:
 
 - **Host match** — virtual hosting by `Host` header (e.g. `api.example.com` → one backend,

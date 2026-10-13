@@ -1,128 +1,109 @@
-import type { ReactNode } from "react";
-import { DiagonalStripes } from "@/components/decorative-shapes";
-import {
-  ActivityIcon,
-  EarthIcon,
-  LayoutDashboardIcon,
-  LockKeyholeIcon,
-  RouteIcon,
-  ShieldCheckIcon,
-} from "@/components/icons";
+import { eyebrow } from "./constants";
+import { Scribble } from "./scribbles";
 
-type FeatureItem = {
-  title: string;
-  description: string;
-  icon: ReactNode;
-  span: string;
-  flagship?: boolean;
-};
-
-const features: FeatureItem[] = [
+const features = [
   {
     title: "WAF inspection",
     description:
-      "Coraza v3 and the OWASP Core Rule Set inspect requests for SQLi, XSS, RCE, path traversal, and known scanner agents. It's the pipeline stage every request runs through before reaching your backend.",
-    icon: <ShieldCheckIcon aria-hidden="true" className="size-7" size={28} />,
-    span: "lg:col-span-2 lg:row-span-2",
-    flagship: true,
+      "Coraza v3 and the OWASP Core Rule Set check every request for SQLi, XSS, RCE, path traversal and known scanners before it reaches your backend.",
   },
   {
     title: "Reverse proxy",
     description:
-      "Route by Host header or path prefix to any number of backends, with automatic prefix stripping like nginx.",
-    icon: <RouteIcon aria-hidden="true" className="size-6" size={24} />,
-    span: "lg:col-span-2",
+      "Route by Host header or path prefix to any number of backends, with prefix stripping that works the way nginx does.",
   },
   {
     title: "IP and geo blocking",
     description:
-      "Block by country with the bundled GeoIP2 database, or create IP rules directly.",
-    icon: <EarthIcon aria-hidden="true" className="size-6" size={24} />,
-    span: "lg:col-span-1",
+      "Block countries with the bundled GeoIP2 database, or add IP rules directly from the dashboard.",
   },
   {
     title: "TLS per service",
     description:
-      "Use Let's Encrypt or upload a certificate per service. Changes never require a restart.",
-    icon: <LockKeyholeIcon aria-hidden="true" className="size-6" size={24} />,
-    span: "lg:col-span-1",
+      "Let's Encrypt or your own certificate, per service. Changing one never needs a restart.",
   },
   {
     title: "Admin dashboard",
     description:
-      "View traffic charts, filter request logs, and manage services through the HTMX dashboard. Saved changes hot-reload the affected subsystem.",
-    icon: (
-      <LayoutDashboardIcon aria-hidden="true" className="size-6" size={24} />
-    ),
-    span: "lg:col-span-2",
+      "Live logs with a GoAccess-style stats view, one-click WAF exceptions, and rule dry-runs. Saving a change hot-reloads only the part it touches.",
   },
   {
-    title: "Prometheus metrics",
+    title: "Metrics and analytics",
     description:
-      "Scrape request volume, Go runtime metrics, and block counters for IP, geo, WAF, bot, and rate-limit decisions.",
-    icon: <ActivityIcon aria-hidden="true" className="size-6" size={24} />,
-    span: "lg:col-span-2",
+      "Prometheus counters for every block decision, health probes for your load balancer, and an optional ClickHouse mirror for a year of history.",
   },
+];
+
+const notNeeded = [
+  "Docker",
+  "a config.yaml",
+  "a database server",
+  "a MaxMind account",
+  "Redis (until you run several nodes)",
 ];
 
 export function FeaturesSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white to-pastel-green-50 px-5 py-20 sm:px-8 lg:py-24 dark:from-pastel-green-900 dark:to-pastel-green-950">
-      <DiagonalStripes className="-right-10 top-0 hidden h-64 w-64 text-pastel-green-700/[0.06] sm:block dark:text-pastel-green-200/[0.05]" />
-      <div className="relative z-10 mx-auto max-w-6xl">
-        <div className="mx-auto mb-12 max-w-2xl text-center">
-          <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-pixie-green-700 dark:text-pixie-green-300">
-            Everything in one process
-          </p>
-          <h2 className="text-balance text-3xl font-extrabold tracking-[-0.03em] text-pastel-green-950 sm:text-4xl dark:text-pastel-green-50">
-            Security and routing, without the sprawl
-          </h2>
-          <p className="mt-4 text-pretty text-base leading-7 text-pastel-green-900/70 sm:text-lg dark:text-pastel-green-100/70">
-            Add backends from the dashboard, then apply WAF rules, rate limits,
-            TLS, and IP controls without editing configuration files.
-          </p>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-flow-row-dense lg:grid-cols-4">
-          {features.map(({ title, description, icon, span, flagship }) => (
-            <article
-              key={title}
-              className={`group relative overflow-hidden border border-pastel-green-700/15 bg-white transition duration-200 hover:-translate-y-0.5 hover:border-pastel-green-500/40 dark:border-pastel-green-300/10 dark:bg-pastel-green-900/35 ${span} ${
-                flagship
-                  ? "flex flex-col justify-between rounded-3xl p-8 shadow-sm hover:shadow-[0_22px_55px_rgba(16,34,18,0.12)]"
-                  : "rounded-2xl p-6 shadow-sm hover:shadow-[0_14px_35px_rgba(16,34,18,0.1)]"
-              }`}
-            >
-              <div className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-gradient-to-r from-pastel-green-400 to-pastel-green-700 transition-transform duration-200 group-hover:scale-x-100" />
-              <div>
-                <div
-                  className={`mb-5 flex items-center justify-center rounded-xl bg-gradient-to-br from-pastel-green-100 to-pastel-green-200 text-pastel-green-700 dark:from-pastel-green-800 dark:to-pastel-green-900 dark:text-pastel-green-200 ${
-                    flagship ? "size-14" : "size-12"
-                  }`}
-                >
-                  {icon}
-                </div>
-                <h3
-                  className={`font-bold text-pastel-green-950 dark:text-pastel-green-50 ${
-                    flagship ? "text-2xl" : "text-lg"
-                  }`}
-                >
+    <section className="border-b border-rule px-5 py-20 sm:px-8 lg:py-24">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid gap-12 lg:grid-cols-[1fr_2fr]">
+          <div>
+            <p className={eyebrow}>What's inside the binary</p>
+            <h2 className="mt-4 text-balance text-4xl leading-tight text-ink">
+              Six jobs, one process.
+            </h2>
+            <p className="mt-4 text-pretty leading-7 text-ink-soft">
+              Each of these usually means another service to run. Here they
+              share one process and one SQLite file.
+            </p>
+
+            <div className="relative mt-10 rotate-[-1deg]">
+              <div
+                aria-hidden="true"
+                className="hatch absolute inset-0 translate-x-2 translate-y-2 rounded-md border border-rule"
+              />
+              <div className="relative rounded-md border border-rule bg-paper-2 p-5">
+                <p className="font-hand text-2xl text-ink">
+                  things you won't need
+                </p>
+                <ul className="mt-3 space-y-1.5">
+                  {notNeeded.map((item) => (
+                    <li
+                      key={item}
+                      className="text-ink-soft line-through decoration-stamp/70 decoration-2"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <ol className="grid gap-x-10 sm:grid-cols-2">
+            {features.map(({ title, description }, index) => (
+              <li
+                key={title}
+                className="border-t border-dashed border-rule py-6"
+              >
+                <span className="font-mono text-sm text-accent">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-2 text-2xl text-ink">
                   {title}
+                  {index === 0 ? (
+                    <Scribble
+                      kind="underline"
+                      className="mt-0.5 block h-2.5 w-40 text-accent"
+                    />
+                  ) : null}
                 </h3>
-                <p
-                  className={`mt-2 leading-6 text-pastel-green-900/65 dark:text-pastel-green-100/65 ${
-                    flagship ? "text-base" : "text-sm"
-                  }`}
-                >
+                <p className="mt-2 text-pretty leading-7 text-ink-soft">
                   {description}
                 </p>
-              </div>
-              {flagship ? (
-                <span className="mt-6 inline-flex w-fit items-center rounded-full bg-pixie-green-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-pixie-green-800 dark:bg-pixie-green-900/50 dark:text-pixie-green-200">
-                  Core pipeline stage
-                </span>
-              ) : null}
-            </article>
-          ))}
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>

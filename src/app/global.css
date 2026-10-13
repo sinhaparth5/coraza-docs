@@ -214,3 +214,103 @@ html > body[data-scroll-locked] {
     transparent 1px 0.5rem
   );
 }
+
+/* Drafting papers. Faint ink, never one of the meaning colours. */
+.grid-paper {
+  --minor: color-mix(in oklab, var(--fn-ink) 5%, transparent);
+  --major: color-mix(in oklab, var(--fn-ink) 10%, transparent);
+  background-image:
+    linear-gradient(var(--major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--major) 1px, transparent 1px),
+    linear-gradient(var(--minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--minor) 1px, transparent 1px);
+  background-size:
+    2.5rem 2.5rem,
+    2.5rem 2.5rem,
+    0.5rem 0.5rem,
+    0.5rem 0.5rem;
+  background-position: center top;
+}
+
+.dot-grid {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--fn-ink) 18%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 1.25rem 1.25rem;
+  background-position: center top;
+}
+
+/* Masked patterns: the SVG tile is the mask, the colour is a theme token,
+   so they follow dark mode. Painted behind the element's content. */
+.iso-grid,
+.jaali,
+.block-print {
+  position: relative;
+  isolation: isolate;
+}
+.iso-grid::before,
+.jaali::before,
+.block-print::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--pattern-color);
+  mask-image: var(--pattern);
+  mask-size: var(--pattern-size);
+  mask-position: center top;
+}
+.iso-grid {
+  --pattern-color: color-mix(in oklab, var(--fn-ink) 7%, transparent);
+  --pattern-size: 1.75rem 3.03125rem;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='48.5'%3E%3Cpath d='M0 0.5H28M0 24.25H28M0 0L28 48.5M28 0L0 48.5' stroke='black' fill='none'/%3E%3C/svg%3E");
+}
+/* Jaali: the carved stone lattice that lets air through and keeps people
+   out, the same job as the firewall. */
+.jaali {
+  --pattern-color: color-mix(in oklab, var(--fn-ink) 22%, transparent);
+  --pattern-size: 1.25rem 1.25rem;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Cg stroke='black' stroke-width='1.6' fill='none'%3E%3Ccircle cx='10' cy='10' r='10'/%3E%3Ccircle cx='0' cy='0' r='10'/%3E%3Ccircle cx='20' cy='0' r='10'/%3E%3Ccircle cx='0' cy='20' r='10'/%3E%3Ccircle cx='20' cy='20' r='10'/%3E%3C/g%3E%3Ccircle cx='10' cy='10' r='1.6'/%3E%3Ccircle cx='0' cy='0' r='1.6'/%3E%3Ccircle cx='20' cy='0' r='1.6'/%3E%3Ccircle cx='0' cy='20' r='1.6'/%3E%3Ccircle cx='20' cy='20' r='1.6'/%3E%3C/svg%3E");
+}
+/* A hand block-printed border, Sanganeri style: diamond, dots, scallop. */
+.block-print {
+  --pattern-color: color-mix(in oklab, var(--fn-ink) 30%, transparent);
+  --pattern-size: 2rem 1.25rem;
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='20'%3E%3Cpath d='M16 1.5L23 8L16 14.5L9 8Z' fill='none' stroke='black' stroke-width='1.2'/%3E%3Ccircle cx='16' cy='8' r='1.8'/%3E%3Ccircle cx='1' cy='8' r='1.2'/%3E%3Ccircle cx='31' cy='8' r='1.2'/%3E%3Cpath d='M0 19.5Q8 15 16 19.5T32 19.5' fill='none' stroke='black'/%3E%3C/svg%3E");
+  mask-repeat: repeat-x;
+}
+
+/* Printer's crop marks just outside each corner of a figure card. */
+.crop-marks {
+  position: relative;
+}
+.crop-marks::after {
+  --m: linear-gradient(var(--color-ink-soft), var(--color-ink-soft));
+  content: "";
+  position: absolute;
+  inset: -1rem;
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    var(--m) left 0 top 1rem / 0.75rem 1px,
+    var(--m) left 1rem top 0 / 1px 0.75rem,
+    var(--m) right 0 top 1rem / 0.75rem 1px,
+    var(--m) right 1rem top 0 / 1px 0.75rem,
+    var(--m) left 0 bottom 1rem / 0.75rem 1px,
+    var(--m) left 1rem bottom 0 / 1px 0.75rem,
+    var(--m) right 0 bottom 1rem / 0.75rem 1px,
+    var(--m) right 1rem bottom 0 / 1px 0.75rem;
+  background-repeat: no-repeat;
+}
+
+/* "§ 01 ·" before each landing section's eyebrow. */
+body {
+  counter-reset: section;
+}
+.section-no::before {
+  counter-increment: section;
+  content: "§ " counter(section, decimal-leading-zero) "  ·  ";
+}

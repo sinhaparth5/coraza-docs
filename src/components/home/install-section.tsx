@@ -7,12 +7,13 @@ import {
   secondaryButton,
 } from "./constants";
 import { CopyableCommand } from "./copyable-command";
+import { DimensionLine, Stamp } from "./ornaments";
 
 export function InstallSection() {
   return (
-    <section className="border-b border-rule bg-paper-2/60 px-5 py-20 sm:px-8 lg:py-24">
-      <div className="mx-auto max-w-3xl">
-        <p className={eyebrow}>Install</p>
+    <section className="dot-grid border-b border-rule bg-paper-2/60 px-5 py-20 sm:px-8 lg:py-24">
+      <div className="relative mx-auto max-w-3xl">
+        <p className={`section-no ${eyebrow}`}>Install</p>
         <h2 className="mt-4 text-balance text-4xl leading-tight text-ink">
           One command on a fresh Linux box.
         </h2>
@@ -24,6 +25,12 @@ export function InstallSection() {
           </code>{" "}
           and registers three systemd units.
         </p>
+        <Stamp
+          tone="accent"
+          className="mt-5 -rotate-6 sm:absolute sm:right-0 sm:top-1 sm:mt-0"
+        >
+          sha-256 verified
+        </Stamp>
 
         <div className="mt-8">
           <CopyableCommand
@@ -31,6 +38,7 @@ export function InstallSection() {
             display="curl -fsSL …/install.sh | sudo bash"
             command="curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | sudo bash"
           />
+          <DimensionLine label="fresh box → running waf" className="mt-3" />
         </div>
 
         <dl className="mt-8 grid gap-6 border-t border-dashed border-rule pt-6 sm:grid-cols-2">

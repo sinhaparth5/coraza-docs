@@ -10,6 +10,7 @@ import {
   InstallSection,
 } from "@/components/home";
 import { faqItems, GITHUB_URL } from "@/components/home/constants";
+import { JaaliDivider } from "@/components/home/ornaments";
 import { getLatestRelease, type Release } from "@/lib/release";
 import { appName, siteUrl } from "@/lib/shared";
 import seoImage from "@/static/img/seo_image.jpg";
@@ -162,11 +163,13 @@ export default async function HomePage() {
       />
       <div className="field-notes paper-grain flex flex-1 flex-col bg-paper text-ink">
         <HeroSection />
+        <JaaliDivider />
         <div id="main" className="home-reveal">
           <FeaturesSection />
           <ArchitectureSection />
           <AutobanSection />
           <DashboardSection />
+          <JaaliDivider />
           <InstallSection />
           <FaqSection />
         </div>

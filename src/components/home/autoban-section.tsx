@@ -12,10 +12,10 @@ const scoring = [
 
 export function AutobanSection() {
   return (
-    <section className="border-b border-rule px-5 py-20 sm:px-8 lg:py-24">
-      <div className="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[1fr_1.35fr]">
+    <section className="iso-grid border-b border-rule px-5 py-20 sm:px-8 lg:py-24">
+      <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
         <div>
-          <p className={eyebrow}>Automatic banning</p>
+          <p className={`section-no ${eyebrow}`}>Automatic banning</p>
           <h2 className="mt-4 text-balance text-4xl leading-tight text-ink">
             Keep trying and you stop getting answers.
           </h2>
@@ -57,7 +57,7 @@ export function AutobanSection() {
           </Link>
         </div>
 
-        <div className="rounded-lg border border-rule bg-paper-2/70 p-4 sm:p-6">
+        <div className="crop-marks rounded-lg border border-rule bg-paper-2/70 p-4 sm:p-6">
           <AutobanStream />
           <p className="sr-only">
             Illustration: one IP sends repeated login attempts and an SQL

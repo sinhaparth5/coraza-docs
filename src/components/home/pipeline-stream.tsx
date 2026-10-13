@@ -18,7 +18,6 @@ const GATES = [
 const STOP_ODDS = [0.12, 0.13, 0.1, 0.2];
 const METHODS = ["GET", "GET", "GET", "POST", "PUT"];
 const ROUTES = ["→api", "→www", "→blog"];
-const GATE_W = 16;
 
 type Packet = {
   row: number;
@@ -32,6 +31,10 @@ type Packet = {
 function createScene(): Scene {
   let rows = 0;
   let gateX: number[] = [];
+  // Phones get thinner gates and bracketless stamps so a request and its
+  // verdict fit in the gap between two gates.
+  let narrow = false;
+  let GATE_W = 16;
   let packets: Packet[] = [];
   let stamps: { x: number; y: number; text: string; life: number }[] = [];
   const counts = [0, 0, 0, 0, 0];
@@ -41,7 +44,11 @@ function createScene(): Scene {
   return {
     resize({ width, height }) {
       rows = Math.max(3, Math.floor((height - CELL_H * 3) / (CELL_H * 1.5)));
-      gateX = GATES.map((_, i) => Math.round(width * (0.15 + i * 0.165)));
+      narrow = width < 520;
+      GATE_W = narrow ? 10 : 16;
+      gateX = GATES.map((_, i) =>
+        Math.round(width * (narrow ? 0.1 + i * 0.16 : 0.15 + i * 0.165)),
+      );
     },
 
     step(dt, { width, cw }) {
@@ -80,10 +87,13 @@ function createScene(): Scene {
         p.x += p.speed * dt;
         if (p.stopAt >= 0 && p.x + p.text.length * cw >= gateX[p.stopAt]) {
           counts[p.stopAt]++;
+          const text = narrow
+            ? GATES[p.stopAt].stamp.slice(1, -1)
+            : GATES[p.stopAt].stamp;
           stamps.push({
-            x: gateX[p.stopAt] - cw * 5.5,
+            x: gateX[p.stopAt] - cw * (text.length + 0.5),
             y: rowY(p.row),
-            text: GATES[p.stopAt].stamp,
+            text,
             life: 1,
           });
           continue;

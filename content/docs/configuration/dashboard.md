@@ -15,7 +15,7 @@ Each form writes its change to `waf.db` and then **hot-reloads** the relevant su
 blocklist, geo, WAF engine, or rate limiter). No file edit or restart is required.
 :::
 
-![Coraza WAF Mod dashboard home — live traffic chart, requests today, blocked today, bot shield summary, and top threats panel](/img/docs/docs_dashboard.png)
+![Palisade dashboard home — live traffic chart, requests today, blocked today, bot shield summary, and top threats panel](/img/docs/docs_dashboard.png)
 
 ## Services (backend apps) — *what gets proxied*
 
@@ -223,6 +223,19 @@ interfering). You can force history mode with `?mode=history`.
 
 ![Live Logs page showing the live stream active indicator, date/app/status filters, and the request log table with time, app, IP, method, path, status, and duration columns](/img/docs/docs_logs.png)
 
+**Live behaviour.** New rows are inserted in batches, so a traffic burst costs one repaint, and the
+table keeps the newest 500 rows. **Pause** holds new rows back instead of shifting the ones you're
+reading, and a "N new · show" button adds them; scrolling down to read does the same. The status
+reads **Live**, **Paused** or **Reconnecting**. Rows open with Tab and Enter, and the detail modal
+traps focus and returns it to the row on close.
+
+**Stats view.** The **Table / Stats** toggle switches to a GoAccess-style summary: requests, unique
+visitors, blocked share, 404s, 5xx and average response time; a requests-per-minute chart for the
+last hour (blocked in red); and top-10 panels for paths, IPs, block reasons (with rule ID), 404
+paths, status codes, countries, services, browsers and operating systems. It seeds from the last hour
+(`GET /admin/logs/stats`) and then updates on every request over the same stream as the table. The
+choice is remembered for the browser session.
+
 **Filtering.** Use the filter controls; they map to query parameters on `GET /admin/logs`:
 
 | Filter | Param | Example |
@@ -242,6 +255,12 @@ a **"Was this rule correct?"** row lets you mark it **False positive** or **Corr
 **Suggested Exceptions** card described above under **Blocks**; marking doesn't change the request's
 own outcome, it only records signal for future suggestions.
 
+**Create exception.** A blocked request's detail view also has a **Create exception** button
+(`POST /admin/logs/exception/:id`). It disables the rule that blocked the request **for that
+request's service only**, and the WAF reloads live. The rule and service are read from the stored log
+row, never from the browser. The exception appears under
+[Per-Service Exceptions](/docs/security/waf#per-service-exceptions) on the WAF Rules page.
+
 ![Log detail view showing timestamp, app/service, host, real client IP vs proxy/CDN IP, country, query string, user agent, request ID, ASN, ISP/organisation, and TLS connection details](/img/docs/docs_logs_detail.png)
 
 **Export.** The **Export** button hits `GET /admin/logs/export` with the *same* filter query params
@@ -250,7 +269,7 @@ and streams the matching rows as newline-delimited JSON (`.ndjson`).
 **Retention.** Logs are pruned by the separate `prune` command / systemd timer, not from this page
 (see [Log Retention & Pruning](/docs/configuration/log-retention)).
 
-**Routes:** `GET /logs`, `GET /logs/stream` (SSE), `GET /logs/:id`, `GET /logs/export`.
+**Routes:** `GET /logs`, `GET /logs/stream` (SSE), `GET /logs/stats`, `GET /logs/:id`, `GET /logs/export`, `POST /logs/feedback/:id`, `POST /logs/exception/:id`.
 
 ## Settings
 
@@ -279,7 +298,7 @@ secure context (HTTPS with a real hostname, or `localhost`); the card shows a wa
 form when the admin panel is reached over plain HTTP or a bare IP. **Remove** a passkey with its row's
 delete control (`DELETE /admin/settings/passkeys/:id`).
 
-**Registered devices.** Coraza WAF Mod keeps **one live admin session at a time**: signing in on a new
+**Registered devices.** Palisade keeps **one live admin session at a time**: signing in on a new
 device immediately signs the previous one out. The **Registered devices** card lists every session,
 live or historical, with its browser/OS, resolved country, IP, and last-active time. A live session's
 row control **signs it out**; an already signed-out row's control **deletes it from history** instead,

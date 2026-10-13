@@ -1,34 +1,87 @@
 import Image from "next/image";
-import { BlurBlob, DotGrid } from "@/components/decorative-shapes";
+import Link from "next/link";
+import { ArrowRightIcon } from "@/components/icons";
 import dashboardImage from "@/static/img/hero_image.png";
+import { eyebrow } from "./constants";
+import { ExceptionStream } from "./exception-stream";
+import { Scribble } from "./scribbles";
+
+const notes = [
+  "live request log, no aggregator",
+  "filter by status, app or date",
+  "edit a service, it hot-reloads",
+];
 
 export function DashboardSection() {
   return (
-    <section className="relative isolate overflow-hidden bg-[color-mix(in_oklch,var(--color-sinbad-950)_55%,black)] px-5 py-20 text-center sm:px-8 lg:py-24">
-      <BlurBlob className="-left-40 top-[-12rem] size-[36rem] bg-sinbad-500/20" />
-      <BlurBlob className="-right-32 bottom-[-16rem] size-[34rem] bg-pixie-green-500/15" />
-      <DotGrid className="inset-0 text-white/[0.04]" />
+    <section className="border-b border-rule px-5 py-20 sm:px-8 lg:py-24">
+      <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className={eyebrow}>Admin dashboard</p>
+          <h2 className="mt-4 text-balance text-4xl leading-tight text-ink">
+            See every decision as it happens.
+          </h2>
+        </div>
 
-      <div className="relative z-10 mx-auto max-w-6xl">
-        <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.16em] text-pixie-green-300">
-          Admin dashboard
-        </p>
-        <h2 className="mx-auto max-w-2xl text-balance text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl">
-          Watch every request decision as it happens
-        </h2>
-        <p className="mx-auto mb-10 mt-4 max-w-xl text-pretty text-base leading-7 text-white/65 sm:text-lg">
-          Filter request decisions by status, app, or date. The live view
-          streams new traffic as it arrives, with no separate log aggregator to
-          run.
-        </p>
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/20 shadow-[0_35px_90px_-25px_rgba(0,0,0,0.75)] ring-1 ring-pixie-green-300/15">
-          <Image
-            src={dashboardImage}
-            alt="Coraza WAF Mod admin dashboard with live traffic charts, a request log, and threat summaries"
-            sizes="(max-width: 1280px) 92vw, 1152px"
-            quality={88}
-            className="h-auto w-full"
-          />
+        <div className="mt-12 grid items-start gap-8 lg:grid-cols-[1fr_14rem]">
+          <figure className="m-0 -rotate-[0.5deg] overflow-hidden rounded-md border border-rule bg-paper-2 p-2 shadow-[0_18px_40px_-24px_rgba(0,0,0,0.45)]">
+            <Image
+              src={dashboardImage}
+              alt="Palisade admin dashboard with live traffic charts, a request log, and threat summaries"
+              sizes="(max-width: 1024px) 92vw, 860px"
+              quality={88}
+              className="h-auto w-full rounded-sm"
+            />
+          </figure>
+
+          <ul className="space-y-6 lg:pt-10">
+            {notes.map((note) => (
+              <li
+                key={note}
+                className="flex items-start gap-2 font-hand text-2xl leading-7 text-ink"
+              >
+                <Scribble
+                  kind="arrow-right"
+                  className="mt-1 hidden h-5 w-9 shrink-0 rotate-180 text-accent lg:block"
+                />
+                {note}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-16 grid items-center gap-10 lg:grid-cols-[1fr_1.5fr]">
+          <div>
+            <h3 className="text-balance text-3xl leading-tight text-ink">
+              Blocked a real customer? Fix it from the log.
+            </h3>
+            <p className="mt-4 text-pretty leading-7 text-ink-soft">
+              Open the blocked request and click{" "}
+              <strong className="font-semibold text-ink">
+                Create exception
+              </strong>
+              . The rule is turned off for that service only and the WAF
+              reloads. Before you add a new rule, dry-run it against the last
+              2000 logged requests to see what it would change.
+            </p>
+            <Link
+              href="/docs/security/waf#dry-run-candidate-rules"
+              className="mt-5 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-accent no-underline hover:underline"
+            >
+              Exceptions and dry-runs
+              <ArrowRightIcon aria-hidden="true" size={14} />
+            </Link>
+          </div>
+          <div className="rounded-lg border border-rule bg-paper p-4 sm:p-6">
+            <ExceptionStream />
+            <p className="sr-only">
+              Illustration: a live request log. A search for o'brien is blocked
+              by rule 942100. Create exception is clicked, the rule is turned
+              off for the shop service, and the same request then passes. A
+              dry-run then replays 2000 logged requests and marks two whose
+              verdict would change, without saving anything.
+            </p>
+          </div>
         </div>
       </div>
     </section>

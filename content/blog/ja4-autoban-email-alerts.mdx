@@ -4,12 +4,12 @@ date: 2026-07-02
 title: "JA4 Fingerprinting, Automatic IP Banning, and Email Alerts"
 authors: [parth]
 tags: [security, waf, autoban, email-alerts, go]
-description: Coraza WAF Mod now uses JA4 TLS fingerprints, can ban IPs based on threat scores, and gives alert emails a recognizable sender name.
+description: Palisade now uses JA4 TLS fingerprints, can ban IPs based on threat scores, and gives alert emails a recognizable sender name.
 image: /img/seo_image.jpg
 keywords: [coraza, waf, ja4, tls fingerprinting, autoban, ip banning, email alerts, security]
 ---
 
-This week Coraza WAF Mod moved from JA3 to JA4 TLS fingerprinting, gained automatic IP banning, and started putting a recognizable sender name on alert emails.
+This week Palisade moved from JA3 to JA4 TLS fingerprinting, gained automatic IP banning, and started putting a recognizable sender name on alert emails.
 
 {/* truncate */}
 
@@ -23,7 +23,7 @@ JA4, introduced by FoxIO, changes the fingerprint format:
 - The raw JA4 string exposes useful fields directly. `t13d1516h2` means TLS 1.3, 15 ciphers, 16 extensions, and HTTP/2. A JA3 hash requires a lookup table.
 - The combined hash uses sorted, normalised fields, so shuffling the extension list no longer changes the fingerprint.
 
-Coraza WAF Mod now computes JA4 at the TLS handshake and stores the hash with every request log. You'll see it in the detail view alongside the country and ASN. No configuration change is required.
+Palisade now computes JA4 at the TLS handshake and stores the hash with every request log. You'll see it in the detail view alongside the country and ASN. No configuration change is required.
 
 ## Automatic IP banning
 
@@ -68,7 +68,7 @@ Before this change, alert emails arrived from a bare `alert@astrareconslabs.com`
 The `mailer` package now sets a `From` header with a display name:
 
 ```
-From: Coraza WAF Mod <alert@astrareconslabs.com>
+From: Palisade <alert@astrareconslabs.com>
 ```
 
 Gmail, Apple Mail, and Outlook all render the display name in the sender column, so ban alerts and daily digest emails are immediately identifiable without opening them.

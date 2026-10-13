@@ -10,7 +10,7 @@ The installer writes `/etc/systemd/system/coraza-waf-mod.service` similar to:
 
 ```ini
 [Unit]
-Description=Coraza WAF Mod (WAF + reverse proxy)
+Description=Palisade (WAF + reverse proxy)
 After=network.target
 
 [Service]

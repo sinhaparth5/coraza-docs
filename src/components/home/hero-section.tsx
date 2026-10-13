@@ -1,63 +1,70 @@
-import Image from "next/image";
 import Link from "next/link";
-import { DotGrid } from "@/components/decorative-shapes";
-import gradientImage from "@/static/img/Gradient.png";
-import shapeImage from "@/static/img/Shape.png";
-import { GITHUB_URL, primaryButton, secondaryButton } from "./constants";
+import { getLatestRelease } from "@/lib/release";
+import {
+  eyebrow,
+  GITHUB_URL,
+  primaryButton,
+  secondaryButton,
+} from "./constants";
 import { CopyableCommand } from "./copyable-command";
-import { HeroSearchButton } from "./hero-search-button";
+import { RequestStream } from "./request-stream";
+import { Scribble } from "./scribbles";
 
-export function HeroSection() {
+export async function HeroSection() {
+  const release = await getLatestRelease();
+
   return (
     <section
       id="top"
-      className="relative isolate overflow-hidden border-b border-pastel-green-700/10 bg-pastel-green-50 dark:bg-pastel-green-950"
+      className="relative border-b border-rule px-5 pb-16 pt-14 sm:px-8 lg:pb-24 lg:pt-20"
     >
-      <Image
-        src={gradientImage}
-        alt=""
-        fill
-        priority
-        quality={90}
-        sizes="100vw"
-        className="-z-20 object-cover opacity-70 dark:opacity-15"
+      {/* Notebook margin rule. */}
+      <div
         aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 left-3 hidden w-px bg-stamp/30 sm:block lg:left-8"
       />
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(115deg,rgba(243,249,243,0.8),rgba(230,242,231,0.2)_55%,rgba(205,230,207,0.4))] dark:bg-[linear-gradient(115deg,rgba(16,34,18,0.95),rgba(39,65,42,0.5))]" />
-      <DotGrid className="-right-16 top-0 hidden h-80 w-80 text-pastel-green-700/[0.07] lg:block dark:text-pastel-green-200/[0.06]" />
 
-      <div className="relative mx-auto grid min-h-[46rem] w-full max-w-7xl grid-cols-1 px-5 py-16 sm:px-8 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:px-12 lg:py-20">
-        <div className="relative z-10 max-w-2xl lg:col-start-1">
-          <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-pastel-green-700/20 bg-pastel-green-100/80 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-pastel-green-800 dark:border-pastel-green-300/20 dark:bg-pastel-green-900/60 dark:text-pastel-green-200">
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex size-full rounded-full bg-pixie-green-500 opacity-75 motion-safe:animate-ping" />
-              <span className="relative inline-flex size-2 rounded-full bg-pixie-green-600 dark:bg-pixie-green-300" />
-            </span>
-            Open Source WAF
-          </span>
-          <h1 className="max-w-3xl text-balance text-4xl font-extrabold leading-[1.06] tracking-[-0.04em] text-pastel-green-950 sm:text-5xl lg:text-6xl dark:text-pastel-green-50">
-            Coraza WAF Mod: WAF and reverse proxy in a single Go binary
-          </h1>
-        </div>
-
-        <div className="relative z-0 my-8 w-full lg:absolute lg:left-1/2 lg:top-36 lg:my-0 lg:w-[min(76rem,92vw)] lg:-translate-x-1/2">
-          <Image
-            src={shapeImage}
-            alt=""
-            priority
-            quality={90}
-            sizes="(max-width: 768px) 100vw, 1200px"
-            className="h-auto w-full opacity-90 drop-shadow-[0_24px_55px_rgba(53,97,57,0.12)] dark:opacity-45"
-            aria-hidden="true"
-          />
-        </div>
-
-        <div className="relative z-10 max-w-md self-end lg:col-start-2 lg:row-start-2 lg:-mb-11 lg:ml-auto">
-          <p className="mb-7 text-pretty text-base leading-7 text-pastel-green-900/85 sm:text-lg dark:text-pastel-green-100/85">
-            Run Coraza v3, OWASP CRS, TLS, routing, and an admin dashboard
-            without Docker or an external database.
+      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_1fr]">
+        <div>
+          {release ? (
+            <Link
+              href={release.url}
+              target="_blank"
+              rel="noreferrer"
+              className="mb-5 inline-flex min-h-9 items-center gap-2 rounded-full border border-rule bg-paper-2 px-3 font-mono text-xs text-ink-soft no-underline transition-colors duration-200 hover:border-ink hover:text-ink"
+            >
+              <span
+                aria-hidden="true"
+                className="size-1.5 rounded-full bg-accent"
+              />
+              latest release {release.tag}
+              {release.date ? (
+                <span className="hidden sm:inline">
+                  {" · "}
+                  {new Date(release.date).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+              ) : null}
+              <span aria-hidden="true">→</span>
+            </Link>
+          ) : null}
+          <p className={eyebrow}>
+            Palisade · built on OWASP Coraza · Apache 2.0
           </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <h1 className="mt-5 text-balance text-[2.6rem] leading-[1.05] tracking-[-0.01em] text-ink sm:text-6xl">
+            A web application firewall you can{" "}
+            <span className="highlight">scp</span> to a server.
+          </h1>
+          <p className="mt-6 max-w-xl text-pretty text-lg leading-8 text-ink-soft">
+            Coraza v3, the OWASP Core Rule Set, a reverse proxy, TLS and an
+            admin dashboard, compiled into one Go binary. No Docker. No database
+            server. A file and a systemd unit.
+          </p>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/docs" className={primaryButton}>
               Read the docs
             </Link>
@@ -70,14 +77,30 @@ export function HeroSection() {
               View on GitHub
             </Link>
           </div>
-          <div className="mt-5 flex flex-col gap-3">
+
+          <div className="relative mt-8 max-w-xl">
+            <p className="mb-2 font-hand text-xl text-ink-soft">
+              or install it in one line
+              <Scribble
+                kind="arrow-down"
+                className="ml-2 inline-block h-6 w-8 text-ink-soft"
+              />
+            </p>
             <CopyableCommand
               light
               display="curl -fsSL …/install.sh | sudo bash"
               command="curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | sudo bash"
             />
-            <HeroSearchButton />
           </div>
+        </div>
+
+        <div className="rounded-lg border border-rule bg-paper-2/70 p-4 sm:p-6">
+          <RequestStream />
+          <p className="sr-only">
+            Illustration: a stream of HTTP requests moves toward the firewall.
+            Normal requests pass through to the backend, while SQL injection,
+            XSS and path traversal attempts are blocked with a 403.
+          </p>
         </div>
       </div>
     </section>

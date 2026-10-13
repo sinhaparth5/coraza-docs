@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getBlogPosts } from "@/lib/blog";
+import { siteUrl as baseUrl } from "@/lib/shared";
 import { source } from "@/lib/source";
-
-const baseUrl = "https://waf.astrareconslabs.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const docsPages: MetadataRoute.Sitemap = source.getPages().map((page) => ({
@@ -20,7 +19,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: baseUrl, changeFrequency: "weekly", priority: 1 },
-    { url: `${baseUrl}/blog`, changeFrequency: "daily", priority: 0.8 },
+    { url: `${baseUrl}/blog`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/privacy`, changeFrequency: "yearly", priority: 0.2 },
     ...docsPages,
     ...blogPosts,
   ];

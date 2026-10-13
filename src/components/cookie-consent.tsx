@@ -34,7 +34,9 @@ function useConsent(): { consent: ConsentValue; mounted: boolean } {
 }
 
 const buttonBase =
-  "inline-flex min-h-10 items-center justify-center rounded-lg px-4 text-sm font-bold transition duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pixie-green-500";
+  "inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md px-4 text-sm font-semibold transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+const buttonInk = `${buttonBase} bg-ink text-paper shadow-[3px_3px_0_var(--color-highlight)] hover:-translate-y-px hover:shadow-[4px_4px_0_var(--color-highlight)] active:translate-y-0 active:shadow-[1px_1px_0_var(--color-highlight)]`;
+const buttonOutline = `${buttonBase} border border-ink/30 text-ink hover:border-ink hover:bg-paper-2`;
 
 export function CookieConsentBanner() {
   const { consent, mounted } = useConsent();
@@ -42,41 +44,47 @@ export function CookieConsentBanner() {
   if (!mounted || consent !== null) return null;
 
   return (
-    <div
-      role="dialog"
+    <section
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-fd-border bg-fd-popover/95 px-4 py-3 text-fd-popover-foreground shadow-xl backdrop-blur"
+      className="fixed inset-x-4 bottom-4 z-50 sm:left-auto sm:right-6 sm:w-[23rem]"
     >
-      <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs leading-5 text-fd-muted-foreground">
-          We use an essential cookie to remember this choice, and — only if you
-          agree — Google Analytics cookies to understand how the docs are used.{" "}
+      {/* A note taped to the corner of the page. */}
+      <span
+        aria-hidden="true"
+        className="absolute -top-3 right-10 z-10 h-6 w-20 rotate-6 bg-highlight/70"
+      />
+      <div className="paper-grain rotate-[0.6deg] rounded-md border border-rule bg-paper p-5 text-ink shadow-[0_18px_40px_-20px_rgba(0,0,0,0.45)]">
+        <p className="font-hand text-2xl leading-none">
+          a quick note on cookies
+        </p>
+        <p className="mt-3 text-sm leading-6 text-ink-soft">
+          One essential cookie remembers this choice. Google Analytics cookies
+          are set only if you agree, to see which docs people read.{" "}
           <Link
             href="/privacy"
-            className="font-medium text-pixie-green-600 underline underline-offset-2 hover:text-pixie-green-700"
+            className="font-medium text-ink underline decoration-accent decoration-2 underline-offset-4 hover:decoration-ink"
           >
             Details
           </Link>
-          .
         </p>
-        <div className="flex shrink-0 gap-2">
-          <button
-            type="button"
-            onClick={() => setConsent("all")}
-            className={`${buttonBase} min-h-9 flex-1 bg-pixie-green-600 px-3 text-xs text-white hover:bg-pixie-green-700 sm:flex-none`}
-          >
-            Accept all
-          </button>
+        <div className="mt-4 grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => setConsent("essential")}
-            className={`${buttonBase} min-h-9 flex-1 border border-fd-border bg-transparent px-3 text-xs hover:bg-fd-muted sm:flex-none`}
+            className={buttonOutline}
           >
             Essential only
           </button>
+          <button
+            type="button"
+            onClick={() => setConsent("all")}
+            className={buttonInk}
+          >
+            Accept all
+          </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -89,40 +97,40 @@ export function CookieConsentPreferences() {
   const { consent, mounted } = useConsent();
 
   return (
-    <div className="rounded-xl border border-fd-border bg-fd-card p-5">
-      <p className="text-sm font-bold">Your current choice</p>
-      <p className="mt-2 text-sm leading-6 text-fd-muted-foreground">
+    <div className="rounded-md border border-rule bg-paper-2 p-5 text-ink">
+      <p className="font-hand text-2xl leading-none">your current choice</p>
+      <p className="mt-3 text-sm leading-6 text-ink-soft">
         {!mounted
           ? "Loading your preference…"
           : consent === null
             ? "You have not made a choice yet — the consent banner is shown."
             : consentLabels[consent]}
       </p>
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
         <button
           type="button"
           onClick={() => setConsent("all")}
-          className={`${buttonBase} bg-pixie-green-600 text-white hover:bg-pixie-green-700`}
+          className={buttonInk}
         >
           Accept all
         </button>
         <button
           type="button"
           onClick={() => setConsent("essential")}
-          className={`${buttonBase} border border-fd-border bg-transparent hover:bg-fd-muted`}
+          className={buttonOutline}
         >
           Essential only
         </button>
         <button
           type="button"
           onClick={() => clearConsent()}
-          className={`${buttonBase} border border-fd-border bg-transparent text-fd-muted-foreground hover:bg-fd-muted`}
+          className={`${buttonOutline} text-ink-soft`}
         >
           Reset choice
         </button>
       </div>
       {mounted && consent === "all" && (
-        <p className="mt-3 text-xs leading-5 text-fd-muted-foreground">
+        <p className="mt-3 text-xs leading-5 text-ink-soft">
           Note: switching to “Essential only” stops new analytics scripts from
           loading, but scripts already loaded on this page stay active until you
           reload.

@@ -6,8 +6,9 @@
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono:
     var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
-  --font-heading:
-    var(--font-clash-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-calistoga), Georgia, serif;
+  --font-hand: var(--font-caveat), "Comic Sans MS", cursive;
+  --font-heading: var(--font-display);
 
   /* Cool, low-chroma neutral family — carries backgrounds, surfaces, and body
      text so large areas of the UI stay calm instead of vivid. */
@@ -53,69 +54,40 @@
   --color-pastel-green-900: var(--color-pixie-green-900);
   --color-pastel-green-950: var(--color-pixie-green-950);
 
-  --color-fd-background: var(--color-sinbad-50);
-  --color-fd-foreground: var(--color-sinbad-950);
-  --color-fd-muted: var(--color-sinbad-100);
-  --color-fd-muted-foreground: var(--color-sinbad-700);
-  --color-fd-popover: #ffffff;
-  --color-fd-popover-foreground: var(--color-sinbad-950);
-  --color-fd-card: #ffffff;
-  --color-fd-card-foreground: var(--color-sinbad-950);
-  --color-fd-border: color-mix(
-    in oklch,
-    var(--color-sinbad-500) 28%,
-    transparent
-  );
-  --color-fd-primary: var(--color-pixie-green-600);
-  --color-fd-primary-foreground: #ffffff;
-  --color-fd-secondary: var(--color-sinbad-100);
-  --color-fd-secondary-foreground: var(--color-sinbad-900);
-  --color-fd-accent: var(--color-pixie-green-100);
-  --color-fd-accent-foreground: var(--color-pixie-green-900);
-  --color-fd-ring: var(--color-pixie-green-500);
+  /* Field-notes palette for the landing page: warm paper, green-black ink,
+     a highlighter accent, and a red "stamp" reserved for blocked requests. */
+  --color-paper: var(--fn-paper);
+  --color-paper-2: var(--fn-paper-2);
+  --color-ink: var(--fn-ink);
+  --color-ink-soft: var(--fn-ink-soft);
+  --color-rule: var(--fn-rule);
+  --color-highlight: var(--fn-highlight);
+  --color-accent: var(--fn-accent);
+  --color-stamp: var(--fn-stamp);
+}
+
+html {
+  --fn-paper: oklch(97.2% 0.013 85);
+  --fn-paper-2: oklch(94.6% 0.018 85);
+  --fn-card: oklch(98.6% 0.009 85);
+  --fn-ink: oklch(24% 0.025 160);
+  --fn-ink-soft: oklch(41% 0.022 160);
+  --fn-rule: oklch(24% 0.025 160 / 0.16);
+  --fn-highlight: oklch(89% 0.12 135);
+  --fn-accent: oklch(46% 0.1 150);
+  --fn-stamp: oklch(51% 0.18 28);
 }
 
 .dark {
-  --color-fd-background: var(--color-sinbad-950);
-  --color-fd-foreground: var(--color-sinbad-50);
-  --color-fd-muted: color-mix(
-    in oklch,
-    var(--color-sinbad-900) 72%,
-    var(--color-sinbad-950)
-  );
-  --color-fd-muted-foreground: var(--color-sinbad-200);
-  --color-fd-popover: color-mix(
-    in oklch,
-    var(--color-sinbad-900) 58%,
-    var(--color-sinbad-950)
-  );
-  --color-fd-popover-foreground: var(--color-sinbad-50);
-  --color-fd-card: color-mix(
-    in oklch,
-    var(--color-sinbad-900) 38%,
-    var(--color-sinbad-950)
-  );
-  --color-fd-card-foreground: var(--color-sinbad-50);
-  --color-fd-border: color-mix(
-    in oklch,
-    var(--color-pixie-green-300) 28%,
-    transparent
-  );
-  --color-fd-primary: var(--color-pixie-green-300);
-  --color-fd-primary-foreground: var(--color-sinbad-950);
-  --color-fd-secondary: color-mix(
-    in oklch,
-    var(--color-sinbad-900) 70%,
-    var(--color-sinbad-950)
-  );
-  --color-fd-secondary-foreground: var(--color-sinbad-100);
-  --color-fd-accent: color-mix(
-    in oklch,
-    var(--color-pixie-green-700) 55%,
-    var(--color-sinbad-950)
-  );
-  --color-fd-accent-foreground: var(--color-sinbad-50);
-  --color-fd-ring: var(--color-pixie-green-400);
+  --fn-paper: oklch(19.5% 0.012 160);
+  --fn-paper-2: oklch(23.5% 0.014 160);
+  --fn-card: oklch(22% 0.013 160);
+  --fn-ink: oklch(93% 0.016 90);
+  --fn-ink-soft: oklch(76% 0.016 90);
+  --fn-rule: oklch(93% 0.016 90 / 0.16);
+  --fn-highlight: oklch(42% 0.09 140);
+  --fn-accent: oklch(80% 0.12 145);
+  --fn-stamp: oklch(72% 0.16 28);
 }
 
 html {
@@ -134,6 +106,40 @@ h4,
 h5,
 h6 {
   font-family: var(--font-heading);
+  /* Calistoga ships a single weight; avoid synthetic bold. Unlayered, so
+     this wins over Tailwind's font-bold/font-semibold utilities. */
+  font-weight: 400;
+}
+
+/* Docs (Fumadocs) tokens share the landing page's paper-and-ink palette.
+   Unlayered and listed after the ocean preset so they win over its own
+   .dark values; the --fn-* tokens are what actually swap for dark mode. */
+:root,
+.dark {
+  --color-fd-background: var(--fn-paper);
+  --color-fd-foreground: var(--fn-ink);
+  --color-fd-muted: var(--fn-paper-2);
+  --color-fd-muted-foreground: var(--fn-ink-soft);
+  --color-fd-popover: var(--fn-card);
+  --color-fd-popover-foreground: var(--fn-ink);
+  --color-fd-card: var(--fn-card);
+  --color-fd-card-foreground: var(--fn-ink);
+  --color-fd-border: var(--fn-rule);
+  --color-fd-primary: var(--fn-accent);
+  --color-fd-primary-foreground: var(--fn-paper);
+  --color-fd-secondary: var(--fn-paper-2);
+  --color-fd-secondary-foreground: var(--fn-ink);
+  --color-fd-accent: color-mix(
+    in oklch,
+    var(--fn-highlight) 45%,
+    var(--fn-paper)
+  );
+  --color-fd-accent-foreground: var(--fn-ink);
+  --color-fd-ring: var(--fn-accent);
+}
+
+.dark body {
+  background-image: none;
 }
 
 html > body[data-scroll-locked] {
@@ -177,4 +183,34 @@ html > body[data-scroll-locked] {
     /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override component animations */
     scroll-behavior: auto !important;
   }
+}
+
+/* Paper grain for the landing page: an inline SVG noise tile, kept faint so
+   text contrast is unaffected. */
+.paper-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.highlight {
+  background: linear-gradient(
+    104deg,
+    transparent 0.4em,
+    var(--color-highlight) 0.5em,
+    var(--color-highlight) calc(100% - 0.3em),
+    transparent calc(100% - 0.2em)
+  );
+  background-size: 100% 0.55em;
+  background-position: 0 88%;
+  background-repeat: no-repeat;
+  padding-inline: 0.1em;
+}
+
+/* 45° drafting hatch, 0.5rem apart: the page's symbol for "wall", shared
+   with the canvas figures. */
+.hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-rule) 0 1px,
+    transparent 1px 0.5rem
+  );
 }

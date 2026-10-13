@@ -1,21 +1,23 @@
 ---
 sidebar_position: 6
 title: Access Log
-description: An optional nginx-combined-format access log file, plus a live terminal view in the dashboard.
-keywords: [access log, nginx log format, live terminal, sse]
+description: An nginx-combined-format access log file for GoAccess, fail2ban and log shippers, enabled by default by the installer.
+keywords: [access log, nginx log format, goaccess, fail2ban]
 ---
 
 
-Coraza WAF Mod can write an **nginx-combined-format** access log to a plain text file independently
+Palisade can write an **nginx-combined-format** access log to a plain text file independently
 of the SQLite-backed request log. This supports tools such as `fail2ban`, log shippers, `grep`/`awk`,
 and `logrotate`-style pipelines.
 
 ## Enabling it
 
-It's **opt-in**, off by default:
+The binary leaves it off unless `--access-log` is set. **`install.sh` turns it on** (fresh installs and
+upgrades alike) at `/var/log/coraza/access.log`, using systemd's `LogsDirectory=coraza` so the
+directory is owned by the service user:
 
 ```bash
-./coraza-waf-mod --access-log /var/log/coraza-waf-mod/access.log
+./coraza-waf-mod --access-log /var/log/coraza/access.log
 ```
 
 | Flag | Default | Description |
@@ -34,18 +36,24 @@ render as the conventional `-` placeholder rather than a fabricated value: respo
 the `Referer` header aren't tracked on the underlying request-log row (the same placeholder every
 combined-format line already uses for the identd/userid fields).
 
-## Live terminal view in the dashboard
+Fields taken from the client (method, URL and `User-Agent`) are **escaped the way nginx does it**:
+`"`, `\` and non-printable bytes are written as `\xHH`. Before v2.4.0 they were written raw, so a `"`
+in a User-Agent broke parsing, and a newline let a client forge a whole log line (for example one
+that gets an innocent IP banned by fail2ban).
 
-The **Logs** page (`/admin/logs`) has a **Table / Terminal** toggle. Terminal mode shows a
-dark, monospace panel of raw access-log lines streamed live over SSE
-(`GET /admin/access-log/stream`). It works **regardless of whether `--access-log` is set** because it
-reads the same in-memory broadcast as the file writer rather than reading the file.
+## GoAccess
 
-- Only one SSE connection is open at a time. Switching Table ↔ Terminal closes the active stream and
-  opens the other.
-- The panel **preloads the last 24 hours** of history on page load rather than starting empty.
-- Lines are inserted as plain text (never HTML) since `Path` and `User-Agent` are attacker-controlled,
-  and the panel caps at the last 100 lines.
-- Long lines **scroll horizontally** instead of wrapping, like a real terminal.
-- Auto-scroll-to-newest continues only while you're at or near the bottom. Scrolling up to read
-  history pauses it independently of the manual Pause button.
+The log works with GoAccess out of the box:
+
+```bash
+goaccess /var/log/coraza/access.log --log-format=COMBINED
+```
+
+With the default rotation the log tops out at about 600 MB (100 MB × 5 backups plus the live file).
+
+:::note[The dashboard Terminal tab was removed]
+Before v2.4.0 the Logs page had a **Terminal** tab streaming raw access-log lines
+(`/admin/access-log/stream`). It only connected while selected, so it missed requests. It has been
+replaced by the [Stats view](/docs/configuration/dashboard#request-logs). The on-disk access log is
+unchanged.
+:::

@@ -3,7 +3,7 @@ slug: /intro
 sidebar_position: 1
 title: What It Does
 description: A single-binary Web Application Firewall and reverse proxy for Linux, built on Coraza v3 and the OWASP Core Rule Set.
-keywords: [coraza waf mod, web application firewall, reverse proxy, owasp crs, go, single binary, admin dashboard, mysql, postgres]
+keywords: [palisade waf, web application firewall, reverse proxy, owasp crs, go, single binary, admin dashboard, mysql, postgres]
 ---
 
 
@@ -13,11 +13,18 @@ HTMX/Tailwind admin dashboard. There is **no Docker, database-server, or Node.js
 SQLite is the default, while MySQL/MariaDB and Postgres-compatible databases are available for
 deployments that need an external store.
 
-![Coraza WAF Mod Architecture: User Request → Cloudflare → OS Firewall → Coraza WAF Proxy (with SQLite waf.db and HTMX/Tailwind Admin Dashboard) → Application Service](/img/arch_diagram_white-bg.png)
+:::note[About the name]
+The project was previously called **Coraza WAF Mod**. The binary, systemd units, GitHub repository
+and install URL still use `coraza-waf-mod`, so commands on these pages keep that name until the
+project itself is renamed. Palisade is independent and is not affiliated with or endorsed by OWASP or
+the Coraza project.
+:::
+
+![Palisade Architecture: User Request → Cloudflare → OS Firewall → Coraza WAF Proxy (with SQLite waf.db and HTMX/Tailwind Admin Dashboard) → Application Service](/img/arch_diagram_white-bg.png)
 
 ## What it does
 
-Coraza WAF Mod sits in front of one or more backend web applications and inspects every incoming
+Palisade sits in front of one or more backend web applications and inspects every incoming
 HTTP request before it is allowed to reach a backend. For each request it runs an ordered
 pipeline of defensive checks — IP blocklist, geo blocking, bot challenge, rate limiting, and full
 WAF rule inspection — and only then reverse-proxies the request to the matching backend. Every

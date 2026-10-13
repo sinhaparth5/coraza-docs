@@ -4,12 +4,12 @@ date: 2026-07-17
 title: "MySQL, Postgres, and a Safer Way to Build a DSN"
 authors: [parth]
 tags: [database, release, go]
-description: Coraza WAF Mod v1.6.0 adds MySQL/MariaDB and Postgres-compatible database backends, plus a migration path and a safer way to build connection strings.
+description: Palisade v1.6.0 adds MySQL/MariaDB and Postgres-compatible database backends, plus a migration path and a safer way to build connection strings.
 image: /img/seo_image.jpg
 keywords: [coraza, waf, mysql, postgres, mariadb, cockroachdb, database, dsn, migration, go]
 ---
 
-Coraza WAF Mod has been SQLite-only since the first release. As of v1.6.0, it also runs on MySQL/MariaDB and Postgres-compatible servers, including CockroachDB and Neon.
+Palisade has been SQLite-only since the first release. As of v1.6.0, it also runs on MySQL/MariaDB and Postgres-compatible servers, including CockroachDB and Neon.
 
 {/* truncate */}
 
@@ -57,7 +57,7 @@ printf '%s\n' "$DB_PASSWORD" | coraza-waf-mod build-dsn \
 
 ## Moving an existing install off SQLite
 
-If you're already running Coraza WAF Mod on SQLite and want to move to Postgres, the **Database connection** card on the Settings page builds a connection from structured fields or accepts a raw DSN, either way. **Test connection** does a five-second dial and ping without touching the live server, so you can confirm reachability before committing to anything.
+If you're already running Palisade on SQLite and want to move to Postgres, the **Database connection** card on the Settings page builds a connection from structured fields or accepts a raw DSN, either way. **Test connection** does a five-second dial and ping without touching the live server, so you can confirm reachability before committing to anything.
 
 **Migrate configuration here** then copies services, rules, settings, secrets (re-encrypted for the target if `--db-key-file` is in use), certificates, and API keys into the new, empty database. Request logs, sessions, and rate-limit state are deliberately left behind. None of that is worth migrating, and dragging it along would make the migration slower for no benefit. The source database is never touched, so if something looks wrong on the target you still have a working SQLite file to fall back to.
 

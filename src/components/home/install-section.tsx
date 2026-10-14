@@ -8,6 +8,7 @@ import {
 } from "./constants";
 import { CopyableCommand } from "./copyable-command";
 import { DimensionLine, Stamp } from "./ornaments";
+import { InkWords } from "./scroll-motion";
 
 export function InstallSection() {
   return (
@@ -15,7 +16,7 @@ export function InstallSection() {
       <div className="relative mx-auto max-w-3xl">
         <p className={`section-no ${eyebrow}`}>Install</p>
         <h2 className="mt-4 text-balance text-4xl leading-tight text-ink">
-          One command on a fresh Linux box.
+          <InkWords text="One command on a fresh Linux box." />
         </h2>
         <p className="mt-4 text-pretty leading-7 text-ink-soft">
           The installer detects your architecture, verifies the SHA-256

@@ -5,6 +5,7 @@ import dashboardImage from "@/static/img/hero_image.png";
 import { eyebrow } from "./constants";
 import { ExceptionStream } from "./exception-stream";
 import { Scribble } from "./scribbles";
+import { TiltFigure } from "./scroll-motion";
 
 const notes = [
   "live request log, no aggregator",
@@ -24,7 +25,7 @@ export function DashboardSection() {
         </div>
 
         <div className="mt-12 grid items-start gap-8 lg:grid-cols-[1fr_14rem]">
-          <figure className="m-0 -rotate-[0.5deg] overflow-hidden rounded-md border border-rule bg-paper-2 p-2 shadow-[0_18px_40px_-24px_rgba(0,0,0,0.45)]">
+          <TiltFigure className="m-0 -rotate-[0.5deg] overflow-hidden rounded-md border border-rule bg-paper-2 p-2 shadow-[0_18px_40px_-24px_rgba(0,0,0,0.45)]">
             <Image
               src={dashboardImage}
               alt="Palisade admin dashboard with live traffic charts, a request log, and threat summaries"
@@ -32,7 +33,7 @@ export function DashboardSection() {
               quality={88}
               className="h-auto w-full rounded-sm"
             />
-          </figure>
+          </TiltFigure>
 
           <ul className="space-y-6 lg:pt-10">
             {notes.map((note) => (

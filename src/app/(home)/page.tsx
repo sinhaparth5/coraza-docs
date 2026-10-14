@@ -11,6 +11,7 @@ import {
 } from "@/components/home";
 import { faqItems, GITHUB_URL } from "@/components/home/constants";
 import { JaaliDivider } from "@/components/home/ornaments";
+import { ScrollProgress } from "@/components/home/scroll-motion";
 import { getLatestRelease, type Release } from "@/lib/release";
 import { appName, siteUrl } from "@/lib/shared";
 import seoImage from "@/static/img/seo_image.jpg";
@@ -162,6 +163,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="field-notes paper-grain flex flex-1 flex-col bg-paper text-ink">
+        <ScrollProgress />
         <HeroSection />
         <JaaliDivider />
         <div id="main" className="home-reveal">

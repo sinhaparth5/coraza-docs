@@ -4,6 +4,7 @@ import { ArrowRightIcon } from "@/components/icons";
 import archDiagram from "@/static/img/arch_diagram_white-bg.png";
 import { eyebrow, pipeline } from "./constants";
 import { PipelineStream } from "./pipeline-stream";
+import { ScrollRule } from "./scroll-motion";
 
 export function ArchitectureSection() {
   return (
@@ -30,22 +31,35 @@ export function ArchitectureSection() {
           </p>
         </div>
 
-        <ol className="mt-6 grid gap-px overflow-hidden rounded-md border border-rule bg-rule sm:grid-cols-5">
-          {pipeline.map(({ stage, title, detail }, index) => (
-            <li key={stage} className="relative bg-paper p-5">
-              <p className="font-mono text-xs text-ink-soft">
-                {stage}
-                <span aria-hidden="true" className="text-accent">
-                  {index < pipeline.length - 1 ? " ──▶" : " ✓"}
-                </span>
-              </p>
-              <h3 className="mt-3 text-xl text-ink">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-ink-soft">{detail}</p>
-            </li>
-          ))}
-        </ol>
+        <div className="relative mt-6">
+          {/* The request travelling through the stages as you read them. */}
+          <ScrollRule
+            axis="x"
+            offset={["start 85%", "start 40%"]}
+            className="inset-x-0 top-0 z-10 hidden h-0.5 rounded-full sm:block"
+          />
+          <ScrollRule
+            axis="y"
+            offset={["start 80%", "end 60%"]}
+            className="inset-y-0 left-0 z-10 w-0.5 rounded-full sm:hidden"
+          />
+          <ol className="grid gap-px overflow-hidden rounded-md border border-rule bg-rule sm:grid-cols-5">
+            {pipeline.map(({ stage, title, detail }, index) => (
+              <li key={stage} className="relative bg-paper p-5">
+                <p className="font-mono text-xs text-ink-soft">
+                  {stage}
+                  <span aria-hidden="true" className="text-accent">
+                    {index < pipeline.length - 1 ? " ──▶" : " ✓"}
+                  </span>
+                </p>
+                <h3 className="mt-3 text-xl text-ink">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-ink-soft">{detail}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
 
-        <figure className="relative mx-auto mt-16 max-w-5xl">
+        <figure className="parallax relative mx-auto mt-16 max-w-5xl [--parallax:-1rem] sm:[--parallax:-2rem]">
           {/* Tape strips holding the diagram to the page. */}
           <span
             aria-hidden="true"

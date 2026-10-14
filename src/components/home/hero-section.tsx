@@ -26,7 +26,7 @@ export async function HeroSection() {
       />
 
       {/* Engraved guilloche seal, peeking out behind the figure. */}
-      <Rosette className="pointer-events-none absolute -right-40 -top-28 size-[36rem] text-ink opacity-[0.09] lg:-right-24" />
+      <Rosette className="parallax pointer-events-none absolute -right-40 -top-28 size-[36rem] text-ink opacity-[0.09] [--parallax:4rem] lg:-right-24 lg:[--parallax:6rem]" />
 
       <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)]">
         <div>
@@ -96,7 +96,7 @@ export async function HeroSection() {
           </div>
         </div>
 
-        <div className="crop-marks rounded-lg border border-rule bg-paper-2/70 p-4 sm:p-6">
+        <div className="parallax crop-marks rounded-lg border border-rule bg-paper-2/70 p-4 sm:p-6 lg:[--parallax:-1.5rem]">
           <RequestStream />
           <p className="sr-only">
             Illustration: a stream of HTTP requests moves toward the firewall.

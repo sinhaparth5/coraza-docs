@@ -9,7 +9,7 @@ keywords: [installation, install script, docker, systemd, ghcr, one-line install
 ## Option A — One-line installer
 
 ```bash
-curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | sudo bash
+curl -fsSL https://waf-install.astrareconslabs.com/palisade-waf/install.sh | sudo bash
 ```
 
 The installer is **interactive** (it prompts for admin credentials, HTTPS setup, and an optional
@@ -18,7 +18,7 @@ external database).
 What the installer does:
 
 1. Detects your OS and CPU architecture (`amd64`/`arm64`).
-2. Detects the **latest GitHub release** (or honors a pinned `CORAZA_VERSION`).
+2. Detects the **latest GitHub release** (or honors a pinned `PALISADE_VERSION`).
 3. **Downloads the matching binary and `checksums.txt`, then verifies the SHA-256 checksum** before
    installing to `/usr/local/bin/coraza-waf-mod`.
 4. Prompts interactively for:
@@ -40,13 +40,13 @@ Useful environment overrides:
 
 ```bash
 # Pin a specific version
-curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | sudo CORAZA_VERSION=v1.0.0 bash
+curl -fsSL https://waf-install.astrareconslabs.com/palisade-waf/install.sh | sudo PALISADE_VERSION=v1.0.0 bash
 
 # Private GitHub repository — supply a personal access token
-curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | sudo GITHUB_TOKEN=github_pat_xxxxxxxx bash
+curl -fsSL https://waf-install.astrareconslabs.com/palisade-waf/install.sh | sudo GITHUB_TOKEN=github_pat_xxxxxxxx bash
 
 # Dry run — print every action, write nothing (no root needed)
-curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | DRY_RUN=1 bash
+curl -fsSL https://waf-install.astrareconslabs.com/palisade-waf/install.sh | DRY_RUN=1 bash
 ```
 
 After it finishes:
@@ -65,7 +65,7 @@ exception. You can later switch to a trusted certificate from **Settings → TLS
 Requires Go 1.27+ (the version pinned in `go.mod`).
 
 ```bash
-git clone https://github.com/sinhaparth5/coraza-waf-mod.git
+git clone https://github.com/sinhaparth5/palisade-waf.git
 cd coraza-waf-mod
 make build          # runs `go generate` (minifies JS) then `go build` → ./coraza-waf-mod
 ```
@@ -100,19 +100,19 @@ same way as Option B.
 ## Option D — Published Docker image
 
 Release images are published for `linux/amd64` and `linux/arm64` at
-`ghcr.io/sinhaparth5/coraza-waf-mod`, tagged with the release version and `latest`. Persistent state
+`ghcr.io/sinhaparth5/palisade-waf`, tagged with the release version and `latest`. Persistent state
 lives under `/data`.
 
 ```bash
 # One-time admin setup; type the password followed by Enter.
 docker run --rm -it -v coraza-waf-data:/data \
-  ghcr.io/sinhaparth5/coraza-waf-mod:latest \
+  ghcr.io/sinhaparth5/palisade-waf:latest \
   setup --db /data/waf.db --admin-email you@example.com
 
 # Start the server using the image defaults: :8080, /data/waf.db, /data/certs.
 docker run -d --name coraza-waf-mod -p 8080:8080 \
   -v coraza-waf-data:/data \
-  ghcr.io/sinhaparth5/coraza-waf-mod:latest
+  ghcr.io/sinhaparth5/palisade-waf:latest
 ```
 
 The minimal image includes CA certificates for ACME, threat-intel downloads, email, and webhooks.

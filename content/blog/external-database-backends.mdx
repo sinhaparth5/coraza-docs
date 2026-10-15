@@ -17,7 +17,7 @@ Palisade has been SQLite-only since the first release. As of v1.6.0, it also run
 
 SQLite is still the default, and I'm not planning to change that. One file, no separate process to run, no connection pool to tune. For a single-node WAF sitting in front of a handful of backends, it's the right amount of infrastructure: none.
 
-The requests to support something else came from a specific shape of deployment: multiple WAF instances behind a load balancer, sharing state, where a single SQLite file on one node isn't an option. [Issue #50](https://github.com/sinhaparth5/coraza-waf-mod/issues/50) asked for it directly. Redis already covers shared rate-limit state for that setup; the missing piece was everywhere else: services, IP rules, WAF exceptions, certificates, threat scores.
+The requests to support something else came from a specific shape of deployment: multiple WAF instances behind a load balancer, sharing state, where a single SQLite file on one node isn't an option. [Issue #50](https://github.com/sinhaparth5/palisade-waf/issues/50) asked for it directly. Redis already covers shared rate-limit state for that setup; the missing piece was everywhere else: services, IP rules, WAF exceptions, certificates, threat scores.
 
 ## One query layer, three dialects
 

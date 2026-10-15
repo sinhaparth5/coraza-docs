@@ -90,7 +90,7 @@ export async function HeroSection() {
             <CopyableCommand
               light
               display="curl -fsSL …/install.sh | sudo bash"
-              command="curl -fsSL https://waf-install.astrareconslabs.com/coraza-waf-mod/install.sh | sudo bash"
+              command="curl -fsSL https://waf-install.astrareconslabs.com/palisade-waf/install.sh | sudo bash"
             />
             <DimensionLine label="one line · one binary" className="mt-3" />
           </div>

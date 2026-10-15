@@ -1,4 +1,4 @@
-export const GITHUB_URL = "https://github.com/sinhaparth5/coraza-waf-mod";
+export const GITHUB_URL = "https://github.com/sinhaparth5/palisade-waf";
 
 export const primaryButton =
   "inline-flex min-h-11 cursor-pointer items-center justify-center rounded-md bg-ink px-5 py-3 text-sm font-semibold text-paper no-underline shadow-[3px_3px_0_var(--color-highlight)] transition duration-200 hover:-translate-y-px hover:shadow-[4px_4px_0_var(--color-highlight)] active:translate-y-0 active:shadow-[1px_1px_0_var(--color-highlight)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";

@@ -142,10 +142,12 @@ h6 {
   background-image: none;
 }
 
+/* biome-ignore-start lint/complexity/noImportantStyles: overrides react-remove-scroll's inline styles */
 html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
 }
+/* biome-ignore-end lint/complexity/noImportantStyles: see above */
 
 /* Scroll-reveal for home sections: CSS-only, no JS. Content stays visible
    where animation-timeline is unsupported or motion is reduced. */

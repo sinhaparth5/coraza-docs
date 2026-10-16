@@ -4,6 +4,7 @@ import tags from "../../content/blog/tags.json";
 import defeatingZapImage from "../static/img/blog/defeating-zap-browser-challenge-bypass.png";
 import externalDatabaseBackendsImage from "../static/img/blog/external-database-backends.png";
 import ja4AutobanImage from "../static/img/blog/ja4-autoban-email-alerts.png";
+import palisadeMigrationImage from "../static/img/blog/palisade-2-5-migration.png";
 import perServiceWafImage from "../static/img/blog/per-service-waf-rule-exceptions.png";
 import seoImage from "../static/img/seo_image.jpg";
 import { blogSource } from "./source";
@@ -12,6 +13,7 @@ const blogImages: Record<string, StaticImageData> = {
   "defeating-zap-browser-challenge-bypass": defeatingZapImage,
   "external-database-backends": externalDatabaseBackendsImage,
   "ja4-autoban-email-alerts": ja4AutobanImage,
+  "palisade-2-5-migration": palisadeMigrationImage,
   "per-service-waf-rule-exceptions": perServiceWafImage,
 };
 

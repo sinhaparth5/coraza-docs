@@ -1,0 +1,87 @@
+---
+slug: palisade-2-5-migration
+date: 2026-10-16
+title: "Moving from coraza-waf-mod 2.4.x to Palisade 2.5.0"
+authors: [parth]
+tags: [release, waf]
+description: Version 2.5.0 renamed coraza-waf-mod to Palisade. Re-running the v2.5.0 installer moves your database, certificates, key, and settings to the new paths. A few things still need updating by hand.
+image: /img/seo_image.jpg
+keywords: [coraza, palisade, waf, migration, rename, upgrade, systemd, docker, prometheus]
+---
+
+Version 2.5.0 is where coraza-waf-mod became Palisade. If you installed with `install.sh`, re-running the v2.5.0 installer handles the move for you. Your database, certificates, encryption key, and settings get moved to the new paths. Nothing is recreated.
+
+{/* truncate */}
+
+The full step-by-step is in the [migration guide](/docs/installation/migrating-to-palisade). This post covers what the installer does on your behalf and the handful of things it can't do for you.
+
+## Use the v2.5.0 installer, not the current one
+
+This is the part most likely to go wrong, so it comes first. The current installer only handles v2.5.1 and later. It doesn't contain the migration code anymore. Point it at a 2.4.x box and it won't see an install to upgrade, so it sets up a new, empty Palisade next to the old one.
+
+Run the script from the `v2.5.0` tag instead, pinned to that version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sinhaparth5/coraza-waf-mod/v2.5.0/deploy/install.sh \
+  | sudo CORAZA_VERSION=v2.5.0 bash
+```
+
+The pin variable for that release is still `CORAZA_VERSION`. It became `PALISADE_VERSION` later. Once you're on 2.5.0, the regular installer takes you the rest of the way.
+
+A backup first is optional, but cheap:
+
+```bash
+sudo systemctl stop coraza-waf-mod
+sudo tar czf ~/coraza-backup-$(date +%F).tgz /var/lib/coraza-waf-mod /etc/coraza-waf-mod
+sudo systemctl start coraza-waf-mod
+```
+
+## What the installer moves
+
+The script sees `/usr/local/bin/coraza-waf-mod` and treats the run as an upgrade. It reads `--db-driver` and `--db` out of the old systemd unit, so a MySQL or Postgres setup keeps its DSN. Then it downloads the binary, checks the SHA256, and installs it as `/usr/local/bin/palisade`.
+
+After stopping and disabling the old service and prune timer, it moves three directories:
+
+| From | To | Contains |
+| --- | --- | --- |
+| `/var/lib/coraza-waf-mod` | `/var/lib/palisade` | DB, certs |
+| `/etc/coraza-waf-mod` | `/etc/palisade` | `db.key` |
+| `/var/log/coraza` | `/var/log/palisade` | `access.log` |
+
+The `coraza-waf-mod` user and group get renamed to `palisade`. The uid stays the same, so file ownership still works after the move. Last, the script removes the old binary, units, and Varnish `coraza.conf`, writes the `palisade` equivalents, and starts the service.
+
+To check it worked:
+
+```bash
+sudo systemctl status palisade
+palisade --version          # v2.5.0
+curl -sI http://127.0.0.1:8080/_cz/healthz | grep -i server   # Server: Palisade
+```
+
+## What you have to change yourself
+
+The installer only knows about files on the box. Anything outside it that matched on the old name needs a manual update.
+
+Prometheus metrics are now `palisade_*` instead of `coraza_*`, so Grafana dashboards and alert rules need updating. The 2.5.0 changelog says the metric names didn't change. That's wrong, and I'd rather you hear it here than from an alert that stopped firing.
+
+Log consumers such as fail2ban, GoAccess, or a log shipper need to point at `/var/log/palisade/access.log`. The `X-WAF-Engine` header now reads `Palisade`, so update anything that matches on it. Your own scripts that call `systemctl … coraza-waf-mod` or `/usr/local/bin/coraza-waf-mod` need the new name too.
+
+If you run a cluster with shared Redis, the blocklist channel is now `palisade:ipblocklist:reload`. Nodes on different versions won't sync blocklist reloads with each other, so a rolling upgrade leaves you with split blocklists until the last node is done. Upgrade all nodes together.
+
+Backups also download as `palisade-YYYY-MM-DD.db` now. That one's cosmetic.
+
+## Docker
+
+The image entrypoint changed from `/coraza-waf-mod` to `/palisade`. The `/data` volume layout is the same, so swapping the tag is enough:
+
+```bash
+docker pull ghcr.io/sinhaparth5/coraza-waf-mod:2.5.0
+docker stop coraza-waf && docker rm coraza-waf
+docker run -d --name palisade -p 8080:8080 -v coraza-waf-data:/data ghcr.io/sinhaparth5/coraza-waf-mod:2.5.0
+```
+
+If your compose file or `docker run` overrides `entrypoint:` or the healthcheck command with `/coraza-waf-mod`, change that to `/palisade`.
+
+## If you need to go back
+
+Disable the new units, restore the tarball from the backup step, and reinstall 2.4.1 with its own pinned installer. The exact commands are in the [rollback section](/docs/installation/migrating-to-palisade#rollback) of the guide.

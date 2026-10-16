@@ -21,3 +21,8 @@ curl -fsSL https://waf-install.astrareconslabs.com/palisade-waf/install.sh | sud
 ```
 
 For source installs, `git pull && make build`, then restart the service/process.
+
+:::warning[Coming from coraza-waf-mod 2.4.x?]
+Migrate to 2.5.0 with the pinned v2.5.0 installer first. See
+[Migrating from coraza-waf-mod](/docs/installation/migrating-to-palisade).
+:::
